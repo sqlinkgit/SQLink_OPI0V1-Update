@@ -4,10 +4,13 @@ GIT_DIR="/root/SQLink_OPI0V1-Update"
 WWW_DIR="/var/www/html"
 SVX_CONF="/etc/svxlink/svxlink.conf"
 SOUNDS_DIR="/usr/local/share/svxlink/sounds"
+
 echo "--- START UPDATE ---"
 date
+
 OLD_HASH=""
 NEW_HASH=""
+
 if [ ! -d "$GIT_DIR" ]; then
     cd /root
     git clone $GIT_URL
@@ -19,15 +22,19 @@ else
     git fetch --all
     git reset --hard origin/main
     NEW_HASH=$(git rev-parse HEAD)
+    
     echo "Old Hash: $OLD_HASH"
     echo "New Hash: $NEW_HASH"
+    
     if [ $? -ne 0 ]; then 
         echo "STATUS: FAILURE"
         exit 1
     fi
 fi
+
 SCRIPT_PATH="/usr/local/bin/update_dashboard.sh"
 REPO_SCRIPT="$GIT_DIR/update_dashboard.sh"
+
 if [ -f "$SCRIPT_PATH" ] && [ -f "$REPO_SCRIPT" ]; then
     if ! cmp -s "$REPO_SCRIPT" "$SCRIPT_PATH"; then
         cp "$REPO_SCRIPT" "$SCRIPT_PATH"
@@ -37,6 +44,13 @@ if [ -f "$SCRIPT_PATH" ] && [ -f "$REPO_SCRIPT" ]; then
         exit 0
     fi
 fi
+
+usermod -aG dialout svxlink
+usermod -aG dialout www-data
+usermod -aG gpio svxlink
+usermod -aG gpio www-data
+chown -R svxlink:svxlink /var/log/svxlink
+
 if [ -d "$GIT_DIR/PL" ]; then
     if [ -d "$SOUNDS_DIR/pl_PL" ]; then
         rm -rf "$SOUNDS_DIR/pl_PL"
@@ -44,22 +58,27 @@ if [ -d "$GIT_DIR/PL" ]; then
     mkdir -p "$SOUNDS_DIR"
     rsync -av --delete "$GIT_DIR/PL/" "$SOUNDS_DIR/PL/"
     chmod -R 777 "$SOUNDS_DIR/PL"
+    
     if [ -f "$SVX_CONF" ]; then
         sed -i '/^\[SimplexLogic\]/,/^\[/ s/DEFAULT_LANG=pl_PL/DEFAULT_LANG=PL/' "$SVX_CONF"
         sed -i '/^\[ReflectorLogic\]/,/^\[/ s/DEFAULT_LANG=pl_PL/DEFAULT_LANG=PL/' "$SVX_CONF"
     fi
 fi
+
 cp $GIT_DIR/*.css $WWW_DIR/ 2>/dev/null
 cp $GIT_DIR/*.js $WWW_DIR/ 2>/dev/null
 cp $GIT_DIR/*.png $WWW_DIR/ 2>/dev/null
 cp $GIT_DIR/*.php $WWW_DIR/
+
 if [ ! -f "$WWW_DIR/radio_config.json" ] && [ -f "$GIT_DIR/radio_config.json" ]; then
     cp $GIT_DIR/radio_config.json $WWW_DIR/
 fi
+
 if compgen -G "$GIT_DIR/*.py" > /dev/null; then
     cp $GIT_DIR/*.py /usr/local/bin/
     chmod +x /usr/local/bin/*.py
 fi
+
 for script in $GIT_DIR/*.sh; do
     filename=$(basename "$script")
     if [ "$filename" != "update_dashboard.sh" ] && [ "$filename" != "wifi_guard.sh" ]; then
@@ -67,8 +86,10 @@ for script in $GIT_DIR/*.sh; do
         chmod +x "/usr/local/bin/$filename"
     fi
 done
+
 chown -R www-data:www-data $WWW_DIR
 chmod -R 755 $WWW_DIR
+
 cat <<EOF > /usr/local/bin/clean_logs_on_boot.sh
 #!/bin/bash
 LOG_FILE="/var/log/svxlink"
@@ -87,6 +108,7 @@ nohup /usr/local/bin/watchdog_el.sh > /dev/null 2>&1 &
 exit 0
 EOF
 chmod +x /usr/local/bin/clean_logs_on_boot.sh
+
 sed -i '/wifi_guard.sh/d' /etc/rc.local
 if ! grep -q "clean_logs_on_boot.sh" /etc/rc.local; then
 cat <<EOF > /etc/rc.local
@@ -96,6 +118,7 @@ exit 0
 EOF
     chmod +x /etc/rc.local
 fi
+
 systemctl stop wifi_guard.service 2>/dev/null
 systemctl disable wifi_guard.service 2>/dev/null
 rm /etc/systemd/system/wifi_guard.service 2>/dev/null
@@ -104,8 +127,10 @@ rm /usr/local/bin/wifi_guard.sh 2>/dev/null
 nmcli connection delete "Rescue_AP" 2>/dev/null
 nmcli connection delete "SQLink_Ratunkowy" 2>/dev/null
 nmcli connection delete "SQLink_WiFi_AP" 2>/dev/null
+
 pkill -f svx_event_logger.sh 2>/dev/null
 pkill -f watchdog_el.sh 2>/dev/null
+
 FINAL_STATUS="UP_TO_DATE"
 if [[ "$SELF_UPDATED" == "1" ]]; then
     FINAL_STATUS="SUCCESS"
@@ -114,9 +139,12 @@ elif [[ "$NEW_HASH" == "CLONED" ]]; then
 elif [[ "$OLD_HASH" != "$NEW_HASH" ]]; then
     FINAL_STATUS="SUCCESS"
 fi
+
 echo "STATUS: $FINAL_STATUS"
+
 if [[ "$FINAL_STATUS" == "UP_TO_DATE" ]]; then
     nohup /usr/local/bin/svx_event_logger.sh > /dev/null 2>&1 &
     nohup /usr/local/bin/watchdog_el.sh > /dev/null 2>&1 &
 fi
+
 exit 0

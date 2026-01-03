@@ -76,6 +76,10 @@ def main():
 
     lines = load_lines(CONFIG_FILE)
 
+    serial_port = data.get('SerialPort', '/dev/ttyS2')
+    gpio_ptt = data.get('GpioPtt', '7')
+    gpio_sql = data.get('GpioSql', '10')
+
     modules_str = data.get('Modules')
     if modules_str is not None:
         el_pass = data.get('EL_Password', '')
@@ -91,15 +95,17 @@ def main():
     rx_freq = ""
     tx_freq = ""
     ctcss = "0"
+    
+    radio_data = {}
     if os.path.exists(RADIO_JSON):
         try:
             with open(RADIO_JSON, 'r') as rf:
-                rdata = json.load(rf)
-                rx_freq = rdata.get("rx", "")
-                tx_freq = rdata.get("tx", "")
-                ctcss = rdata.get("ctcss", "0")
+                radio_data = json.load(rf)
+                rx_freq = radio_data.get("rx", "")
+                tx_freq = radio_data.get("tx", "")
+                ctcss = radio_data.get("ctcss", "0")
         except: pass
-
+    
     is_echolink = "0"
     if data.get('Modules') and ("EchoLink" in data['Modules']):
         is_echolink = "1"
@@ -150,7 +156,6 @@ def main():
             "RGR_SOUND_ALWAYS": data.get('RogerBeep'),
             "MODULES": data.get('Modules')
         },
-        
         "EchoLink": {
             "CALLSIGN": data.get('EL_Callsign'),
             "PASSWORD": data.get('EL_Password'),
@@ -160,6 +165,13 @@ def main():
             "PROXY_SERVER": data.get('EL_ProxyHost'),
             "TIMEOUT": data.get('EL_ModTimeout'),
             "LINK_IDLE_TIMEOUT": data.get('EL_IdleTimeout')
+        },
+        "Rx1": {
+            "DTMF_SERIAL": serial_port,
+            "SQL_GPIOD_LINE": gpio_sql
+        },
+        "Tx1": {
+            "PTT_GPIOD_LINE": gpio_ptt
         }
     }
 
@@ -170,15 +182,13 @@ def main():
 
     save_lines(CONFIG_FILE, lines)
 
-    radio_data = {}
-    if os.path.exists(RADIO_JSON):
-        with open(RADIO_JSON, 'r') as f:
-            try: radio_data = json.load(f)
-            except: pass
-
     if 'qth_name' in data: radio_data['qth_name'] = qth_name
     if 'qth_city' in data: radio_data['qth_city'] = qth_city
     if 'qth_loc' in data: radio_data['qth_loc'] = qth_loc
+    
+    radio_data['serial_port'] = serial_port
+    radio_data['gpio_ptt'] = gpio_ptt
+    radio_data['gpio_sql'] = gpio_sql
 
     with open(RADIO_JSON, 'w') as f: json.dump(radio_data, f, indent=4)
 
