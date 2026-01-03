@@ -57,17 +57,17 @@
                 <div class="form-group">
                     <label>Port UART (SA818)</label>
                     <input type="text" name="SerialPort" value="<?php echo $vals['SerialPort']; ?>" placeholder="/dev/ttyS2">
-                    <small style="color:#888; font-size:9px;">SP0DZ: ttyS2, Volt: ttyS1</small>
+                    <small style="color:#888; font-size:9px;">Ścieżka do portu szeregowego (np. /dev/ttyS1)</small>
                 </div>
                 <div class="form-group">
                     <label>GPIO PTT (TX)</label>
                     <input type="number" name="GpioPtt" value="<?php echo $vals['GpioPtt']; ?>">
-                    <small style="color:#888; font-size:9px;">SP0DZ: 7</small>
+                    <small style="color:#888; font-size:9px;">Numer pinu BCM sterującego PTT</small>
                 </div>
                 <div class="form-group">
                     <label>GPIO SQL (RX)</label>
                     <input type="number" name="GpioSql" value="<?php echo $vals['GpioSql']; ?>">
-                    <small style="color:#888; font-size:9px;">SP0DZ: 10</small>
+                    <small style="color:#888; font-size:9px;">Numer pinu BCM (COS/SQL)</small>
                 </div>
             </div>
             <div class="alert alert-warning" style="margin-top:10px; font-size:11px; padding:5px;">
