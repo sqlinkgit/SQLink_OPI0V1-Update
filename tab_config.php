@@ -1,5 +1,5 @@
 <h3>Konfiguracja SvxLink</h3>
-<form method="post" id="svx-config-form">
+<form method="post">
     <input type="hidden" name="active_tab" class="active-tab-input" value="SvxConfig">
     
     <div class="form-grid-layout">
@@ -50,30 +50,6 @@
                 </div>
             </div>
         </div>
-        
-        <div class="panel-box box-full">
-            <h4 class="panel-title" style="color:#FF9800;">⚙️ Sprzęt i GPIO (Hardware)</h4>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
-                <div class="form-group">
-                    <label>Port UART (SA818)</label>
-                    <input type="text" name="SerialPort" value="<?php echo $vals['SerialPort']; ?>" placeholder="/dev/ttyS2">
-                    <small style="color:#888; font-size:9px;">Ścieżka do portu szeregowego (np. /dev/ttyS1)</small>
-                </div>
-                <div class="form-group">
-                    <label>GPIO PTT (TX)</label>
-                    <input type="number" name="GpioPtt" value="<?php echo $vals['GpioPtt']; ?>">
-                    <small style="color:#888; font-size:9px;">Numer pinu BCM sterującego PTT</small>
-                </div>
-                <div class="form-group">
-                    <label>GPIO SQL (RX)</label>
-                    <input type="number" name="GpioSql" value="<?php echo $vals['GpioSql']; ?>">
-                    <small style="color:#888; font-size:9px;">Numer pinu BCM (COS/SQL)</small>
-                </div>
-            </div>
-            <div class="alert alert-warning" style="margin-top:10px; font-size:11px; padding:5px;">
-                ⚠️ <strong>Uwaga:</strong> Zmiana tych ustawień wymaga pełnego restartu urządzenia. Zapisanie formularza spowoduje reboot!
-            </div>
-        </div>
 
         <div class="panel-box box-full">
             <h4 class="panel-title green">Zaawansowane / Audio</h4>
@@ -99,16 +75,5 @@
             </div>
         </div>
     </div>
-    
-    <button type="submit" name="save_svx_full" id="btn-save-full" class="btn btn-blue" style="margin-top:20px; font-size:18px;">
-        💾 Zapisz Wszystko i Restartuj System
-    </button>
+    <button type="submit" name="save_svx_full" class="btn btn-blue" style="margin-top:20px;">Zapisz Wszystko i Restartuj</button>
 </form>
-
-<script>
-    document.getElementById('svx-config-form').addEventListener('submit', function(e) {
-        var btn = document.getElementById('btn-save-full');
-        btn.innerHTML = '⏳ Zapisywanie... Proszę czekać na restart...';
-        btn.classList.add('btn-loading');
-    });
-</script>

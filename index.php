@@ -34,7 +34,6 @@
         echo json_encode($stats);
         exit;
     }
-
     if (isset($_POST['ajax_dtmf'])) {
         $code = $_POST['ajax_dtmf'];
         if (preg_match('/^[0-9A-D*#]+$/', $code)) {
@@ -43,7 +42,6 @@
         } else { echo "ERROR"; }
         exit;
     }
-
     $MIXER_IDS = [
         'ADC_Gain' => 9, 'Mic1_Boost' => 8, 'Mic2_Boost' => 6,
         'Mic1_Cap_Sw' => 18, 'Mic2_Cap_Sw' => 19, 'LineIn_Cap_Sw' => 17, 'Mixer_Cap_Sw' => 15, 'Mixer_Rev_Cap_Sw' => 16,
@@ -60,6 +58,9 @@
         }
         return $default;
     }
+    if (isset($_POST['fix_audio_btn'])) {
+       $audio_msg = ""; 
+    }
     if (isset($_POST['save_audio'])) {
         foreach(['adc_vol'=>9, 'boost1_vol'=>8, 'boost2_vol'=>6, 'out_vol'=>3, 'dac_vol'=>1, 'mic1_pb_vol'=>7, 'mic2_pb_vol'=>5, 'linein_pb_vol'=>2] as $k => $id) if(isset($_POST[$k])) shell_exec("sudo amixer -c 0 cset numid=$id ".(int)$_POST[$k]);
         foreach(['Mic1_Cap_Sw'=>18, 'Mic2_Cap_Sw'=>19, 'LineIn_Cap_Sw'=>17, 'Mixer_Cap_Sw'=>15, 'LineOut_Sw'=>4, 'DAC_Sw'=>10, 'Mic1_PB_Sw'=>13, 'Mic2_PB_Sw'=>14, 'LineIn_PB_Sw'=>12] as $n => $id) shell_exec("sudo amixer -c 0 cset numid=$id ".(isset($_POST[$n])?'on':'off'));
@@ -67,7 +68,6 @@
         $audio_msg = "<div class='alert alert-success'>Zapisano ustawienia audio!</div>";
     }
     $audio = []; foreach ($MIXER_IDS as $name => $id) $audio[$name] = get_amixer_val($id, 0);
-
     function parse_svx_conf($file) {
         $ini = []; $curr = "GLOBAL";
         if (!file_exists($file)) return [];
@@ -80,10 +80,8 @@
         return $ini;
     }
     $ini = parse_svx_conf('/etc/svxlink/svxlink.conf');
-    $ref = $ini['ReflectorLogic'] ?? []; 
-    $simp = $ini['SimplexLogic'] ?? []; 
-    $glob = $ini['GLOBAL'] ?? []; 
-    $el = $ini['EchoLink'] ?? [];
+    $ref = $ini['ReflectorLogic'] ?? []; $simp = $ini['SimplexLogic'] ?? []; $glob = $ini['GLOBAL'] ?? []; $el = $ini['EchoLink'] ?? [];
+    
     $rx1 = $ini['Rx1'] ?? [];
     $tx1 = $ini['Tx1'] ?? [];
 
@@ -93,9 +91,6 @@
         'TmpTimeout' => $ref['TMP_MONITOR_TIMEOUT'] ?? '3600', 'Modules' => $simp['MODULES'] ?? 'Help,Parrot,EchoLink',
         'Beep3Tone' => $ref['TGSTBEEP_ENABLE'] ?? '0', 'AnnounceTG' => $ref['TGREANON_ENABLE'] ?? '0', 'RefStatusInfo' => $ref['REFCON_ENABLE'] ?? '0',
         'RogerBeep' => $simp['RGR_SOUND_ALWAYS'] ?? '0',
-        'SerialPort' => $rx1['DTMF_SERIAL'] ?? '/dev/ttyS2',
-        'GpioSql' => $rx1['SQL_GPIOD_LINE'] ?? '10',
-        'GpioPtt' => $tx1['PTT_GPIOD_LINE'] ?? '7'
     ];
     $vals_el = [
         'Callsign' => $el['CALLSIGN'] ?? $vals['Callsign'], 'Password' => $el['PASSWORD'] ?? '', 'Sysop' => $el['SYSOPNAME'] ?? '',
@@ -104,40 +99,63 @@
     ];
 
     $jsonFile = '/var/www/html/radio_config.json';
-    $radio = ["rx" => "432.8500", "tx" => "432.8500", "ctcss" => "0000", "sq" => "2", "serial_port" => "/dev/ttyS2"];
-    if (file_exists($jsonFile)) { $loaded = json_decode(file_get_contents($jsonFile), true); if ($loaded) $radio = array_merge($radio, $loaded); }
+    $radio = [
+        "rx" => "432.8500", "tx" => "432.8500", "ctcss" => "0000", "sq" => "2",
+        "serial_port" => $rx1['DTMF_SERIAL'] ?? '/dev/ttyS2',
+        "gpio_sql" => $rx1['SQL_GPIOD_LINE'] ?? '10',
+        "gpio_ptt" => $tx1['PTT_GPIOD_LINE'] ?? '7'
+    ];
+
+    if (file_exists($jsonFile)) { 
+        $loaded = json_decode(file_get_contents($jsonFile), true); 
+        if ($loaded) $radio = array_merge($radio, $loaded); 
+    }
 
     if (isset($_POST['save_svx_full'])) {
-        $newData = $_POST;
-        unset($newData['save_svx_full'], $newData['active_tab']);
-        file_put_contents('/tmp/svx_new_settings.json', json_encode($newData));
-        shell_exec('sudo /usr/bin/python3 /usr/local/bin/update_svx_full.py 2>&1');
-        
-        shell_exec('(sleep 2; sudo reboot) > /dev/null 2>&1 &');
-        
-        echo "<div class='alert alert-warning'><strong>💾 Zapisano!</strong><br>Trwa restart urządzenia, proszę czekać...</div>
-              <script>setTimeout(function(){ window.location.href='/'; }, 20000);</script>";
-        echo "</body></html>";
-        exit;
+        $newData = $_POST; unset($newData['save_svx_full'], $newData['active_tab']); file_put_contents('/tmp/svx_new_settings.json', json_encode($newData));
+        shell_exec('sudo /usr/bin/python3 /usr/local/bin/update_svx_full.py 2>&1'); shell_exec('sudo /usr/bin/systemctl restart svxlink > /dev/null 2>&1 &');
+        if(isset($_POST['Callsign'])) $vals['Callsign'] = $_POST['Callsign'];
+        if(isset($_POST['Password'])) $vals['Password'] = $_POST['Password'];
+        if(isset($_POST['Host'])) $vals['Host'] = $_POST['Host'];
+        if(isset($_POST['DefaultTG'])) $vals['DefaultTG'] = $_POST['DefaultTG'];
+        if(isset($_POST['MonitorTGs'])) $vals['MonitorTGs'] = $_POST['MonitorTGs'];
+        if(isset($_POST['EL_Callsign'])) $vals_el['Callsign'] = $_POST['EL_Callsign'];
+        if(isset($_POST['EL_Password'])) $vals_el['Password'] = $_POST['EL_Password'];
+        if(isset($_POST['EL_Sysop'])) $vals_el['Sysop'] = $_POST['EL_Sysop'];
+        if(isset($_POST['EL_Desc'])) $vals_el['Desc'] = $_POST['EL_Desc'];
+        if(isset($_POST['EL_ProxyHost'])) $vals_el['Proxy'] = $_POST['EL_ProxyHost'];
+        echo "<div class='alert alert-success'>Zapisano! Restart...</div><meta http-equiv='refresh' content='3'>";
     }
 
     if (isset($_POST['save_radio'])) {
         $freq = $_POST['single_freq'];
-        $currentPort = $vals['SerialPort']; 
+        
+        $new_serial = $_POST['SerialPort'] ?? '/dev/ttyS2';
+        $new_ptt = $_POST['GpioPtt'] ?? '7';
+        $new_sql = $_POST['GpioSql'] ?? '10';
+
         $newRadio = [
             "rx" => $freq, "tx" => $freq, 
-            "ctcss" => $_POST['ctcss'], "sq" => $_POST['sq'], "desc" => $_POST['radio_desc'],
-            "serial_port" => $currentPort
+            "ctcss" => $_POST['ctcss'], 
+            "sq" => $_POST['sq'], 
+            "desc" => $_POST['radio_desc'],
+            "serial_port" => $new_serial,
+            "gpio_ptt" => $new_ptt,
+            "gpio_sql" => $new_sql
         ];
         file_put_contents($jsonFile, json_encode($newRadio));
         $radio = $newRadio;
+
+        $hwUpdate = ["SerialPort"=>$new_serial, "GpioPtt"=>$new_ptt, "GpioSql"=>$new_sql];
+        file_put_contents('/tmp/svx_new_settings.json', json_encode($hwUpdate));
+        shell_exec('sudo /usr/bin/python3 /usr/local/bin/update_svx_full.py 2>&1');
+
         shell_exec('sudo /usr/bin/systemctl stop svxlink'); sleep(1);
         $cmd = "sudo /usr/bin/python3 /usr/local/bin/setup_radio.py " . escapeshellarg($radio['rx']) . " " . escapeshellarg($radio['tx']) . " " . escapeshellarg($radio['ctcss']) . " " . escapeshellarg($radio['sq']) . " 2>&1";
         $out = shell_exec($cmd);
         shell_exec('sudo /usr/bin/systemctl start svxlink');
-        echo "<div class='alert alert-success'>Radio (Simplex): $out</div>";
+        echo "<div class='alert alert-success'>Radio i Hardware: $out</div>";
     }
-
     if (isset($_POST['restart_srv'])) { shell_exec('sudo /usr/bin/systemctl restart svxlink > /dev/null 2>&1 &'); echo "<div class='alert alert-success'>Restart Usługi...</div>"; }
     if (isset($_POST['reboot_device'])) { shell_exec('sudo /usr/sbin/reboot > /dev/null 2>&1 &'); echo "<div class='alert alert-warning'>🔄 Reboot...</div>"; }
     if (isset($_POST['shutdown_device'])) { shell_exec('sudo /usr/sbin/shutdown -h now > /dev/null 2>&1 &'); echo "<div class='alert alert-error'>🛑 Shutdown...</div>"; }
@@ -201,9 +219,11 @@
     
     $wifi_output = "";
     if (isset($_POST['wifi_scan'])) { shell_exec('sudo nmcli dev wifi rescan'); $raw = shell_exec('sudo nmcli -t -f SSID,SIGNAL,SECURITY dev wifi list 2>&1'); $lines = explode("\n", $raw); foreach($lines as $line) { if(empty($line)) continue; $parts = explode(':', $line); $sec = array_pop($parts); $sig = array_pop($parts); $ssid = implode(':', $parts); if(!empty($ssid)) $wifi_scan_results[$ssid] = ['ssid'=>$ssid, 'signal'=>$sig, 'sec'=>$sec]; } usort($wifi_scan_results, function($a, $b) { return $b['signal'] - $a['signal']; }); }
+    $saved_wifi_list = [];
+    $saved_raw = shell_exec("sudo nmcli -t -f NAME,TYPE connection show | grep '802-11-wireless'");
+    if($saved_raw) { $s_lines = explode("\n", trim($saved_raw)); foreach($s_lines as $s_line) { $s_parts = explode(":", $s_line); if(count($s_parts) >= 1) { $saved_wifi_list[] = $s_parts[0]; } } }
     if (isset($_POST['wifi_connect'])) { $ssid = escapeshellarg($_POST['ssid']); $pass = escapeshellarg($_POST['pass']); $wifi_output = shell_exec("sudo nmcli dev wifi connect $ssid password $pass 2>&1"); }
-    if (isset($_POST['wifi_delete'])) { $ssid = escapeshellarg($_POST['ssid']); $wifi_output = shell_exec("sudo nmcli connection delete $ssid 2>&1"); echo "<div class='alert alert-warning'>Usunięto sieć.</div><meta http-equiv='refresh' content='2'>"; }
-    
+    if (isset($_POST['wifi_delete'])) { $ssid = escapeshellarg($_POST['ssid']); $wifi_output = shell_exec("sudo nmcli connection delete $ssid 2>&1"); echo "<div class='alert alert-warning'>Usunięto sieć: ".htmlspecialchars($_POST['ssid'])."</div><meta http-equiv='refresh' content='2'>"; }
     $cache_file = '/tmp/sqlink_alert_cache.txt';
     $cache_time = 3600; $alert_msg = "";
     if (file_exists($cache_file) && (time() - filemtime($cache_file) < $cache_time)) { $alert_msg = file_get_contents($cache_file); }
@@ -217,37 +237,17 @@
     <title>Hotspot <?php echo $vals['Callsign']; ?></title>
     <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        .btn-loading {
-            position: relative;
-            color: transparent !important;
-            pointer-events: none;
-        }
-        .btn-loading::after {
-            content: "";
-            position: absolute;
-            left: 50%; top: 50%;
-            width: 16px; height: 16px;
-            margin-left: -8px; margin-top: -8px;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
 </head>
 <body>
 <div class="container">
     <?php if (!empty(trim($alert_msg))): ?>
-    <div style="background:#2196F3; color:#fff; text-align:center; padding:12px; font-weight:bold; border-bottom:2px solid #1976D2; font-size:14px;">📢 INFO: <?php echo htmlspecialchars($alert_msg); ?></div>
+    <div style="background:#2196F3; color:#fff; text-align:center; padding:12px; font-weight:bold; border-bottom:2px solid #1976D2; font-size:14px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">📢 INFO: <?php echo htmlspecialchars($alert_msg); ?></div>
     <?php endif; ?>
-    
     <header>
         <div style="position: relative; display: flex; justify-content: center; align-items: center; min-height: 100px;">
-            <img src="sqlink4.png" alt="SQLink" style="position: absolute; left: 15%; top: 50%; transform: translateY(-50%); height: 90px; width: auto; display:none;" class="desktop-only">
+            <img src="sqlink4.png" alt="SQLink" style="position: absolute; left: 15%; top: 50%; transform: translateY(-50%); height: 90px; width: auto;">
             <h1 style="margin: 0; z-index: 2;">Hotspot <?php echo $vals['Callsign']; ?></h1>
-            <img src="ant3.PNG" alt="Radio" style="position: absolute; right: 15%; top: 50%; transform: translateY(-50%); height: 90px; width: auto; display:none;" class="desktop-only">
+            <img src="ant3.PNG" alt="Radio" style="position: absolute; right: 15%; top: 50%; transform: translateY(-50%); height: 90px; width: auto;">
         </div>
         <div class="status-bar" style="flex-direction: column; gap: 5px; margin-top:5px;">
             <div style="display:flex; align-items:center; gap:10px;">
@@ -260,7 +260,6 @@
             </div>
         </div>
     </header>
-
     <div class="telemetry-row">
         <div class="t-box"><div class="t-label">CPU Temp</div><div class="t-val" id="t-temp">...</div><div class="progress-bg"><div class="progress-fill" id="t-temp-bar" style="width: 0%;"></div></div></div>
         <div class="t-box"><div class="t-label">RAM Used</div><div class="t-val" id="t-ram">...</div><div class="progress-bg"><div class="progress-fill" id="t-ram-bar" style="width: 0%;"></div></div></div>
@@ -268,7 +267,14 @@
         <div class="t-box"><div class="t-label">Network</div><div class="t-val" id="t-net-type">...</div><div style="font-size:9px; color:#aaa;" id="t-ip">...</div></div>
         <div class="t-box"><div class="t-label">Hardware</div><div class="t-val" id="t-hw" style="font-size:10px; margin-top:5px;">...</div></div>
     </div>
-
+    <div class="info-panel">
+        <div class="info-box"><div class="info-label">Logiki</div><div class="info-value" style="font-size:11px;"><?php echo str_replace(',', ', ', $glob['LOGICS'] ?? '-'); ?></div></div>
+        <div class="info-box"><div class="info-label">Moduły</div><div class="info-value" style="font-size:11px;"><?php echo $vals['Modules']; ?></div></div>
+        <div class="info-box"><div class="info-label">TG Default</div><div class="info-value hl"><?php echo $vals['DefaultTG']; ?></div></div>
+        <div class="info-box"><div class="info-label">TG Active</div><div class="info-value hl" id="tg-active">---</div></div>
+        <div class="info-box"><div class="info-label">Reflector</div><div class="info-value" id="ref-status">---</div></div>
+        <div class="info-box"><div class="info-label">Uptime</div><div class="info-value" style="font-size:11px;"><?php echo shell_exec("uptime -p"); ?></div></div>
+    </div>
     <div class="tabs">
         <button id="btn-Dashboard" class="tab-btn active" onclick="openTab(event, 'Dashboard')">Dashboard</button>
         <button id="btn-Nodes" class="tab-btn" onclick="openTab(event, 'Nodes')">Nodes</button>
@@ -281,7 +287,6 @@
         <button id="btn-Logs" class="tab-btn" onclick="openTab(event, 'Logs')">Logi</button>
         <button id="btn-Help" class="tab-btn" onclick="openTab(event, 'Help')">Pomoc</button>
     </div>
-
     <div id="Dashboard" class="tab-content active"><?php include 'tab_dashboard.php'; ?></div>
     <div id="DTMF" class="tab-content"><?php include 'tab_dtmf.php'; ?></div>
     <div id="Audio" class="tab-content"><?php include 'tab_audio.php'; ?></div>
@@ -293,19 +298,13 @@
     <div id="Help" class="tab-content"><?php include 'help.php'; ?></div>
     <div id="Logs" class="tab-content"><div id="log-content" class="log-box">...</div></div>
 </div>
-
 <div class="main-footer">
     SvxLink v1.9.99.36@master Copyright (C) 2003-<?php echo date("Y"); ?> Tobias Blomberg / <span class="callsign-blue">SM0SVX</span><br>
     <span class="callsign-blue">SQLink System</span> • SierraEcho & Team Edition<br>
-    Copyright &copy; 2025 by <span class="callsign-blue">SQ7UTP</span>
+    Copyright &copy; 2025<?php if(date("Y") > 2025) echo "-".date("Y"); ?> by <span class="callsign-blue">SQ7UTP</span>
+    <div style="margin-top: 5px; font-size: 9px; opacity: 0.6;"><a href="https://github.com/SQLink-Official/SQLink-Official" target="_blank" style="color: inherit; text-decoration: none;">Source Code (AGPL v3)</a></div>
 </div>
-
-<script> 
-const GLOBAL_CALLSIGN = "<?php echo $vals['Callsign']; ?>"; 
-if(window.innerWidth > 768) {
-    document.querySelectorAll('.desktop-only').forEach(el => el.style.display = 'block');
-}
-</script>
+<script> const GLOBAL_CALLSIGN = "<?php echo $vals['Callsign']; ?>"; </script>
 <script src="script.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

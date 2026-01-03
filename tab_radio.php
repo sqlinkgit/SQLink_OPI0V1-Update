@@ -55,7 +55,29 @@ $CTCSS_MAP = [
                 </div>
             </div>
 
-            <button type="submit" name="save_radio" class="btn btn-green">💾 Zaprogramuj Radio</button>
+            <hr style="border:0; border-top:1px solid #444; margin: 20px 0;">
+            <h4 class="panel-title blue" style="font-size:14px; margin-bottom:15px;">⚙️ Sprzęt i GPIO (Hardware)</h4>
+
+            <div class="form-group">
+                <label>Port UART (SA818)</label>
+                <input type="text" name="SerialPort" value="<?php echo isset($radio['serial_port']) ? $radio['serial_port'] : '/dev/ttyS2'; ?>" placeholder="/dev/ttyS2">
+                <small style="color:#888; font-size:9px;">Ścieżka do portu szeregowego (np. /dev/ttyS1)</small>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-group">
+                    <label>GPIO PTT (TX)</label>
+                    <input type="number" name="GpioPtt" value="<?php echo isset($radio['gpio_ptt']) ? $radio['gpio_ptt'] : '7'; ?>">
+                    <small style="color:#888; font-size:9px;">Pin BCM PTT</small>
+                </div>
+                <div class="form-group">
+                    <label>GPIO SQL (RX)</label>
+                    <input type="number" name="GpioSql" value="<?php echo isset($radio['gpio_sql']) ? $radio['gpio_sql'] : '10'; ?>">
+                    <small style="color:#888; font-size:9px;">Pin BCM COS/SQL</small>
+                </div>
+            </div>
+
+            <button type="submit" name="save_radio" class="btn btn-green" style="margin-top:15px;">💾 Zaprogramuj Radio i Zapisz GPIO</button>
         </form>
     </div>
 
