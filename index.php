@@ -144,15 +144,58 @@
     if (isset($_POST['auto_proxy'])) { $out = shell_exec("sudo /usr/local/bin/proxy_hunter.py 2>&1"); echo "<div class='alert alert-warning'><strong>♻️ Auto-Proxy:</strong><br><small>$out</small></div><meta http-equiv='refresh' content='3'>"; }
     
     if (isset($_POST['git_update'])) {
-        set_time_limit(300); ignore_user_abort(true);
+        set_time_limit(300); 
+        ignore_user_abort(true);
         $out = shell_exec("sudo /usr/local/bin/update_dashboard.sh 2>&1");
+        
         if (strpos($out, 'STATUS: SUCCESS') !== false) {
             shell_exec('(sleep 5; sudo /usr/sbin/reboot) > /dev/null 2>&1 &');
-            echo "<div class='alert alert-success'><strong>✅ AKTUALIZACJA ZAKOŃCZONA!</strong><br>Restart za 5s...<pre style='font-size:10px;'>$out</pre></div><script>setTimeout(function(){window.location.href='/';},15000);</script>";
+            echo "
+            <div class='alert alert-success' style='text-align:left; margin: 20px;'>
+                <strong>✅ AKTUALIZACJA ZAKOŃCZONA SUKCESEM!</strong><br>
+                System zostanie zrestartowany za <span id='cnt'>5</span> sekund...
+                <pre style='font-size:10px; margin-top:5px; background:#111; color:#ccc; padding:5px; border-radius:3px; max-height:300px; overflow:auto;'>$out</pre>
+            </div>
+            <script>
+                if(document.getElementById('loading-overlay')) {
+                    document.getElementById('loading-overlay').style.display = 'none';
+                }
+                var sec = 5;
+                setInterval(function(){
+                    sec--;
+                    var el = document.getElementById('cnt');
+                    if(el) el.innerText = sec;
+                    if(sec <= 0) {
+                         document.body.innerHTML = '<h2 style=\"color:white; text-align:center; margin-top:50px; font-family:sans-serif;\">Trwa ponowne uruchamianie...<br><span style=\"font-size:16px; font-weight:normal;\">Poczekaj chwilę i odśwież stronę.</span></h2>';
+                         setTimeout(function(){ window.location.href = '/'; }, 15000);
+                    }
+                }, 1000);
+            </script>
+            ";
         } elseif (strpos($out, 'STATUS: UP_TO_DATE') !== false) {
-             echo "<div class='alert alert-warning'><strong>⚠️ SYSTEM AKTUALNY</strong></div><meta http-equiv='refresh' content='2;url=/'>";
+             echo "
+             <div class='alert alert-warning' style='text-align:left; margin: 20px;'>
+                <strong>⚠️ SYSTEM JEST JUŻ AKTUALNY</strong><br>
+                Brak nowych zmian do pobrania. Powrót za chwilę...
+             </div>
+             <script>
+                if(document.getElementById('loading-overlay')) {
+                    document.getElementById('loading-overlay').style.display = 'none';
+                }
+             </script>
+             <meta http-equiv='refresh' content='4;url=/'>";
         } else {
-            echo "<div class='alert alert-error'><strong>❌ BŁĄD!</strong><pre>$out</pre><a href='/' class='btn btn-blue'>Wróć</a></div>";
+            echo "
+            <div class='alert alert-error' style='text-align:left; margin: 20px;'>
+                <strong>❌ BŁĄD AKTUALIZACJI!</strong><br>
+                <pre style='font-size:10px; margin-top:5px; background:#300; padding:5px; border-radius:3px; max-height:300px; overflow:auto;'>$out</pre>
+                <br><a href='/' class='btn btn-blue' style='display:inline-block; width:auto; padding:5px 10px;'>Wróć</a>
+            </div>
+            <script>
+                if(document.getElementById('loading-overlay')) {
+                    document.getElementById('loading-overlay').style.display = 'none';
+                }
+            </script>";
         }
     }
     
