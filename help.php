@@ -94,6 +94,12 @@
     <div class="help-text">
         Oto kilka przydatnych funkcji, które ułatwią Ci życie z Hotspotem:
         <ul>
+            <li style="margin-bottom: 8px;"><strong>🔇 Cisza w Eterze (Recytacja Znaku):</strong>
+                <br>Denerwuje Cię ciągłe "Stefan Paweł..."? W zakładce <strong>Config</strong> (sekcja Zaawansowane) możesz wyłączyć opcję <strong>Recytowanie Znaku</strong>. Hotspot przestanie się przedstawiać głosowo (identyfikacja telegrafią CW pozostaje aktywna).
+            </li>
+            <li style="margin-bottom: 8px;"><strong>🛠️ Sprzęt i GPIO (Dla Konstruktorów):</strong>
+                <br>Budujesz własny interfejs lub zmieniasz płytkę? W zakładce <strong>Radio</strong> (na dole) możesz zmienić port <strong>UART (SA818)</strong> oraz piny <strong>GPIO PTT i SQL</strong> bez edycji plików systemowych.
+            </li>
             <li style="margin-bottom: 8px;"><strong>🌍 Twoja Wizytówka w Sieci:</strong>
                 <br>W zakładce <strong>Config</strong> uzupełnij nową sekcję <em>"Lokalizacja i Operator"</em>. Dzięki temu Twoje Imię i Miasto będą widoczne dla innych kolegów w sieci (w dymkach informacyjnych i na mapie).
             </li>
@@ -115,13 +121,13 @@
     <div class="help-title"><span class="help-icon">🔧</span> Szybka Pomoc (Q&A)</div>
     <div class="help-text">
         <strong>❓ Nie mogę połączyć się z EchoLinkiem (Status: Disconnected).</strong><br>
-        ✅ Jeśli używasz internetu mobilnego (GSM), operatorzy często blokują porty. Wejdź w zakładkę <strong>Config</strong> i kliknij zielony przycisk <strong>♻️ Znajdź i ustaw Auto-Proxy</strong>.<br><br>
+        ✅ Jeśli używasz internetu mobilnego (GSM), operatorzy często blokują porty. Wejdź w zakładkę <strong>Config</strong> i kliknij zielony przycisk <strong>♻️ Auto-Proxy</strong>. System automatycznie znajdzie działający serwer proxy.<br><br>
         
         <strong>❓ Hotspot przestał gadać / Dashboard "wisi".</strong><br>
         ✅ Wejdź w zakładkę <strong>⚡ Zasilanie</strong> i kliknij niebieski przycisk <strong>Restart Usługi SvxLink</strong>.<br><br>
 
         <strong>❓ Słyszę komunikaty, ale nikt mnie nie słyszy.</strong><br>
-        ✅ Sprawdź częstotliwość radia i ton CTCSS w zakładce <strong>📻 Radio</strong>.<br><br>
+        ✅ Sprawdź częstotliwość radia i ton CTCSS w zakładce <strong>📻 Radio</strong>. Upewnij się też, że w radiu ręcznym masz ustawiony ten sam ton nadawania.<br><br>
 
         <strong>❓ W logach widzę "Distortion detected".</strong><br>
         ✅ Twoje radio nadaje zbyt głośno do hotspota (przester). Zcisz radio (jeśli podłączone kablem) lub zmniejsz <em>ADC Gain</em> w zakładce Audio.
