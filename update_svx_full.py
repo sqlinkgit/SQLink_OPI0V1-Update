@@ -76,9 +76,31 @@ def main():
 
     lines = load_lines(CONFIG_FILE)
 
-    serial_port = data.get('SerialPort', '/dev/ttyS2')
-    gpio_ptt = data.get('GpioPtt', '7')
-    gpio_sql = data.get('GpioSql', '10')
+    radio_data = {}
+    if os.path.exists(RADIO_JSON):
+        try:
+            with open(RADIO_JSON, 'r') as rf:
+                radio_data = json.load(rf)
+        except: pass
+
+    
+    serial_port = data.get('SerialPort')
+    if serial_port is None: serial_port = radio_data.get('serial_port')
+
+    gpio_ptt = data.get('GpioPtt')
+    if gpio_ptt is None: gpio_ptt = radio_data.get('gpio_ptt')
+
+    gpio_sql = data.get('GpioSql')
+    if gpio_sql is None: gpio_sql = radio_data.get('gpio_sql')
+
+    qth_name = data.get('qth_name')
+    if qth_name is None: qth_name = radio_data.get('qth_name', '')
+
+    qth_city = data.get('qth_city')
+    if qth_city is None: qth_city = radio_data.get('qth_city', '')
+
+    qth_loc = data.get('qth_loc')
+    if qth_loc is None: qth_loc = radio_data.get('qth_loc', '')
 
     modules_str = data.get('Modules')
     if modules_str is not None:
@@ -88,27 +110,25 @@ def main():
             modules_list = [m for m in modules_list if 'EchoLink' not in m]
             data['Modules'] = ",".join(modules_list)
 
-    qth_name = data.get('qth_name', '')
-    qth_city = data.get('qth_city', '')
-    qth_loc = data.get('qth_loc', '')
-
-    rx_freq = ""
-    tx_freq = ""
-    ctcss = "0"
-    
-    radio_data = {}
-    if os.path.exists(RADIO_JSON):
-        try:
-            with open(RADIO_JSON, 'r') as rf:
-                radio_data = json.load(rf)
-                rx_freq = radio_data.get("rx", "")
-                tx_freq = radio_data.get("tx", "")
-                ctcss = radio_data.get("ctcss", "0")
-        except: pass
+    rx_freq = radio_data.get("rx", "")
+    tx_freq = radio_data.get("tx", "")
+    ctcss = radio_data.get("ctcss", "0")
     
     is_echolink = "0"
     if data.get('Modules') and ("EchoLink" in data['Modules']):
         is_echolink = "1"
+    elif radio_data.get('modules') and "EchoLink" in radio_data.get('modules'):
+         pass
+
+    current_default_tg = data.get('DefaultTG')
+    if current_default_tg is None:
+        current_default_tg = "0" 
+        if os.path.exists(NODE_INFO_FILE):
+             try:
+                 with open(NODE_INFO_FILE, 'r') as old_nf:
+                     old_info = json.load(old_nf)
+                     current_default_tg = old_info.get('DefaultTG', '0')
+             except: pass
 
     node_info_data = {
         "Location": qth_city,
@@ -116,7 +136,7 @@ def main():
         "Sysop": qth_name,
         "LAT": "0.0", "LONG": "0.0",
         "TXFREQ": tx_freq, "RXFREQ": rx_freq, "CTCSS": ctcss,
-        "DefaultTG": data.get('DefaultTG', '0'),
+        "DefaultTG": current_default_tg,
         "Mode": "FM", "Type": "1", 
         "Echolink": is_echolink,
         "Website": "http://sqlink.pl",
@@ -134,19 +154,17 @@ def main():
     if qth_name: loc_parts.append(f"(Op: {qth_name})")
     location_str = ", ".join(loc_parts)
 
-    main_callsign = data.get('Callsign', '')
+    main_callsign = data.get('Callsign')
     announce_call = data.get('AnnounceCall', '1')
     
     reflector_callsign = main_callsign
     
-    if announce_call == "1":
-        simplex_callsign = main_callsign
-        short_ident = "60"
-        long_ident = "60"
-    else:
-        simplex_callsign = ""
-        short_ident = "0"
-        long_ident = "0"
+    simplex_callsign = None
+    if main_callsign is not None:
+        if announce_call == "1":
+            simplex_callsign = main_callsign
+        else:
+            simplex_callsign = ""
 
     mapping = {
         "ReflectorLogic": {
@@ -169,8 +187,8 @@ def main():
             "CALLSIGN": simplex_callsign,
             "RGR_SOUND_ALWAYS": data.get('RogerBeep'),
             "MODULES": data.get('Modules'),
-            "SHORT_IDENT_INTERVAL": short_ident,
-            "LONG_IDENT_INTERVAL": long_ident
+            "SHORT_IDENT_INTERVAL": "60" if announce_call=="1" else "0",
+            "LONG_IDENT_INTERVAL": "60" if announce_call=="1" else "0"
         },
         "EchoLink": {
             "CALLSIGN": data.get('EL_Callsign'),
@@ -191,6 +209,10 @@ def main():
         }
     }
 
+    if main_callsign is None:
+        mapping["SimplexLogic"]["SHORT_IDENT_INTERVAL"] = None
+        mapping["SimplexLogic"]["LONG_IDENT_INTERVAL"] = None
+
     for section, keys in mapping.items():
         for cfg_key, json_val in keys.items():
             if json_val is not None:
@@ -202,9 +224,9 @@ def main():
     if 'qth_city' in data: radio_data['qth_city'] = qth_city
     if 'qth_loc' in data: radio_data['qth_loc'] = qth_loc
     
-    radio_data['serial_port'] = serial_port
-    radio_data['gpio_ptt'] = gpio_ptt
-    radio_data['gpio_sql'] = gpio_sql
+    if serial_port: radio_data['serial_port'] = serial_port
+    if gpio_ptt: radio_data['gpio_ptt'] = gpio_ptt
+    if gpio_sql: radio_data['gpio_sql'] = gpio_sql
 
     with open(RADIO_JSON, 'w') as f: json.dump(radio_data, f, indent=4)
 
