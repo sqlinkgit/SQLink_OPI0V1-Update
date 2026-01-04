@@ -65,13 +65,14 @@
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px;">
+            <div class="flex-settings">
                 <div class="form-group"><label>TG Timeout (s)</label><input type="number" name="TgTimeout" value="<?php echo $vals['TgTimeout']; ?>" required min="0"></div>
                 <div class="form-group"><label>Tmp Timeout (s)</label><input type="number" name="TmpTimeout" value="<?php echo $vals['TmpTimeout']; ?>" required min="0"></div>
                 <div class="form-group"><label>Beep 3-ton</label><select name="Beep3Tone"><option value="1" <?php if($vals['Beep3Tone']=='1') echo 'selected'; ?>>TAK</option><option value="0" <?php if($vals['Beep3Tone']=='0') echo 'selected'; ?>>NIE</option></select></div>
                 <div class="form-group"><label>Zapowiedź TG</label><select name="AnnounceTG"><option value="1" <?php if($vals['AnnounceTG']=='1') echo 'selected'; ?>>TAK</option><option value="0" <?php if($vals['AnnounceTG']=='0') echo 'selected'; ?>>NIE</option></select></div>
                 <div class="form-group"><label>Info Link</label><select name="RefStatusInfo"><option value="1" <?php if($vals['RefStatusInfo']=='1') echo 'selected'; ?>>TAK</option><option value="0" <?php if($vals['RefStatusInfo']=='0') echo 'selected'; ?>>NIE</option></select></div>
                 <div class="form-group"><label>Roger Beep</label><select name="RogerBeep"><option value="1" <?php if($vals['RogerBeep']=='1') echo 'selected'; ?>>TAK</option><option value="0" <?php if($vals['RogerBeep']=='0') echo 'selected'; ?>>NIE</option></select></div>
+                <div class="form-group"><label>Mówienie Znaku</label><select name="AnnounceCall"><option value="1" <?php if($vals['AnnounceCall']=='1') echo 'selected'; ?>>TAK</option><option value="0" <?php if($vals['AnnounceCall']=='0') echo 'selected'; ?>>NIE</option></select></div>
             </div>
         </div>
     </div>

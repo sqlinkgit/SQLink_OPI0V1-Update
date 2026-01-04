@@ -273,3 +273,15 @@ input[type="text"], input[type="password"], input[type="number"], select { width
 .map-close-btn { position: absolute; top: 20px; right: 20px; z-index: 2001; background: #F44336; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
 .map-btn-trigger { background: #2196F3; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 15px; display: inline-block; }
 .map-btn-trigger:hover { background: #1976D2; }
+
+.flex-settings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.flex-settings .form-group {
+    flex: 1;
+    min-width: 100px;
+    margin-bottom: 0;
+}

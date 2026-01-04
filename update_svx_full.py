@@ -134,9 +134,23 @@ def main():
     if qth_name: loc_parts.append(f"(Op: {qth_name})")
     location_str = ", ".join(loc_parts)
 
+    main_callsign = data.get('Callsign', '')
+    announce_call = data.get('AnnounceCall', '1')
+    
+    reflector_callsign = main_callsign
+    
+    if announce_call == "1":
+        simplex_callsign = main_callsign
+        short_ident = "60"
+        long_ident = "60"
+    else:
+        simplex_callsign = ""
+        short_ident = "0"
+        long_ident = "0"
+
     mapping = {
         "ReflectorLogic": {
-            "CALLSIGN": data.get('Callsign'),
+            "CALLSIGN": reflector_callsign,
             "AUTH_KEY": data.get('Password'),
             "HOSTS": data.get('Host'),
             "HOST_PORT": data.get('Port'),
@@ -152,9 +166,11 @@ def main():
             "NODE_INFO_FILE": NODE_INFO_FILE
         },
         "SimplexLogic": {
-            "CALLSIGN": data.get('Callsign'),
+            "CALLSIGN": simplex_callsign,
             "RGR_SOUND_ALWAYS": data.get('RogerBeep'),
-            "MODULES": data.get('Modules')
+            "MODULES": data.get('Modules'),
+            "SHORT_IDENT_INTERVAL": short_ident,
+            "LONG_IDENT_INTERVAL": long_ident
         },
         "EchoLink": {
             "CALLSIGN": data.get('EL_Callsign'),
