@@ -83,7 +83,27 @@ def main():
                 radio_data = json.load(rf)
         except: pass
 
-    
+    backup_info = {}
+    if os.path.exists(NODE_INFO_FILE):
+        try:
+            with open(NODE_INFO_FILE, 'r') as nf:
+                backup_info = json.load(nf)
+        except: pass
+
+
+    def get_val(keys_input, key_radio, key_backup, default=""):
+        val = data.get(keys_input)
+        if val is not None: return val
+        
+        val = radio_data.get(key_radio)
+        if val: return val
+        
+        return backup_info.get(key_backup, default)
+
+    qth_name = get_val('qth_name', 'qth_name', 'Sysop')
+    qth_city = get_val('qth_city', 'qth_city', 'Location')
+    qth_loc  = get_val('qth_loc',  'qth_loc',  'Locator')
+
     serial_port = data.get('SerialPort')
     if serial_port is None: serial_port = radio_data.get('serial_port')
 
@@ -93,14 +113,6 @@ def main():
     gpio_sql = data.get('GpioSql')
     if gpio_sql is None: gpio_sql = radio_data.get('gpio_sql')
 
-    qth_name = data.get('qth_name')
-    if qth_name is None: qth_name = radio_data.get('qth_name', '')
-
-    qth_city = data.get('qth_city')
-    if qth_city is None: qth_city = radio_data.get('qth_city', '')
-
-    qth_loc = data.get('qth_loc')
-    if qth_loc is None: qth_loc = radio_data.get('qth_loc', '')
 
     modules_str = data.get('Modules')
     if modules_str is not None:
@@ -120,15 +132,10 @@ def main():
     elif radio_data.get('modules') and "EchoLink" in radio_data.get('modules'):
          pass
 
+
     current_default_tg = data.get('DefaultTG')
     if current_default_tg is None:
-        current_default_tg = "0" 
-        if os.path.exists(NODE_INFO_FILE):
-             try:
-                 with open(NODE_INFO_FILE, 'r') as old_nf:
-                     old_info = json.load(old_nf)
-                     current_default_tg = old_info.get('DefaultTG', '0')
-             except: pass
+        current_default_tg = backup_info.get('DefaultTG', '0')
 
     node_info_data = {
         "Location": qth_city,
@@ -208,7 +215,7 @@ def main():
             "PTT_GPIOD_LINE": gpio_ptt
         }
     }
-
+    
     if main_callsign is None:
         mapping["SimplexLogic"]["SHORT_IDENT_INTERVAL"] = None
         mapping["SimplexLogic"]["LONG_IDENT_INTERVAL"] = None
@@ -220,9 +227,9 @@ def main():
 
     save_lines(CONFIG_FILE, lines)
 
-    if 'qth_name' in data: radio_data['qth_name'] = qth_name
-    if 'qth_city' in data: radio_data['qth_city'] = qth_city
-    if 'qth_loc' in data: radio_data['qth_loc'] = qth_loc
+    radio_data['qth_name'] = qth_name
+    radio_data['qth_city'] = qth_city
+    radio_data['qth_loc'] = qth_loc
     
     if serial_port: radio_data['serial_port'] = serial_port
     if gpio_ptt: radio_data['gpio_ptt'] = gpio_ptt
