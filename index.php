@@ -145,19 +145,29 @@
             "desc" => $_POST['radio_desc'],
             "serial_port" => $new_serial,
             "gpio_ptt" => $new_ptt,
-            "gpio_sql" => $new_sql
+            "gpio_sql" => $new_sql,
+            "qth_name" => $radio['qth_name'] ?? '',
+            "qth_city" => $radio['qth_city'] ?? '',
+            "qth_loc" => $radio['qth_loc'] ?? ''
         ];
         file_put_contents($jsonFile, json_encode($newRadio));
         $radio = $newRadio;
 
         $hwUpdate = ["SerialPort"=>$new_serial, "GpioPtt"=>$new_ptt, "GpioSql"=>$new_sql];
         file_put_contents('/tmp/svx_new_settings.json', json_encode($hwUpdate));
+
         shell_exec('sudo /usr/bin/python3 /usr/local/bin/update_svx_full.py 2>&1');
 
         shell_exec('sudo /usr/bin/systemctl stop svxlink'); sleep(1);
         $cmd = "sudo /usr/bin/python3 /usr/local/bin/setup_radio.py " . escapeshellarg($radio['rx']) . " " . escapeshellarg($radio['tx']) . " " . escapeshellarg($radio['ctcss']) . " " . escapeshellarg($radio['sq']) . " 2>&1";
         $out = shell_exec($cmd);
         shell_exec('sudo /usr/bin/systemctl start svxlink');
+
+        if (file_exists($jsonFile)) { 
+            $loaded = json_decode(file_get_contents($jsonFile), true); 
+            if ($loaded) $radio = array_merge($radio, $loaded); 
+        }
+        
         echo "<div class='alert alert-success'>Radio i Hardware: $out</div>";
     }
     if (isset($_POST['restart_srv'])) { shell_exec('sudo /usr/bin/systemctl restart svxlink > /dev/null 2>&1 &'); echo "<div class='alert alert-success'>Restart Usługi...</div>"; }
