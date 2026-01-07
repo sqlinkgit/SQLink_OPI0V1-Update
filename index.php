@@ -276,6 +276,8 @@
     $cache_time = 3600; $alert_msg = "";
     if (file_exists($cache_file) && (time() - filemtime($cache_file) < $cache_time)) { $alert_msg = file_get_contents($cache_file); }
     else { $ctx = stream_context_create(['http' => ['timeout' => 5]]); $remote_msg = @file_get_contents('https://raw.githubusercontent.com/SQLinkgit/SQLink_OPI0V1-Update/main/alert.txt', false, $ctx); if ($remote_msg !== false) { $alert_msg = $remote_msg; file_put_contents($cache_file, $alert_msg); } elseif (file_exists($cache_file)) { $alert_msg = file_get_contents($cache_file); } }
+    
+    $alert_hash = md5($alert_msg);
 ?>
 <!DOCTYPE html>
 <html lang="pl">
@@ -289,7 +291,10 @@
 <body>
 <div class="container">
     <?php if (!empty(trim($alert_msg))): ?>
-    <div style="background:#2196F3; color:#fff; text-align:center; padding:12px; font-weight:bold; border-bottom:2px solid #1976D2; font-size:14px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">📢 INFO: <?php echo htmlspecialchars($alert_msg); ?></div>
+    <div id="sq-alert" data-hash="<?php echo $alert_hash; ?>" style="background:#2196F3; color:#fff; padding:12px; font-weight:bold; border-bottom:2px solid #1976D2; font-size:14px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display:flex; justify-content:space-between; align-items:center;">
+        <span style="flex:1; text-align:center;">📢 INFO: <?php echo htmlspecialchars($alert_msg); ?></span>
+        <button onclick="dismissAlert('<?php echo $alert_hash; ?>')" style="background:none; border:none; color:#fff; font-weight:bold; font-size:16px; cursor:pointer; padding:0 5px; opacity:0.8;">&#10005;</button>
+    </div>
     <?php endif; ?>
     <header>
         <div style="position: relative; display: flex; justify-content: center; align-items: center; min-height: 100px;">
