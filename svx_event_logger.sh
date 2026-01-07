@@ -7,4 +7,4 @@ touch $LOG_DEST
 chown www-data:www-data $LOG_DEST
 chmod 644 $LOG_DEST
 
-tail -F -n +1 "$LOG_SOURCE" | grep --line-buffered -E "ReflectorLogic: Connection established|ReflectorLogic: Disconnected|ReflectorLogic: Authentication failed|Node joined|Node left|Talker start|Talker stop|Connected nodes|Distortion|Clipping|Underrun|Tx1: Turning the transmitter" >> "$LOG_DEST" &
+tail -F -n +1 "$LOG_SOURCE" | grep --line-buffered -E "ReflectorLogic: Connection established|ReflectorLogic: Disconnected|ReflectorLogic: Authentication failed|Node joined|Node left|Talker start|Talker stop|Connected nodes|Clipping|Underrun|Tx1: Turning the transmitter" >> "$LOG_DEST" &
