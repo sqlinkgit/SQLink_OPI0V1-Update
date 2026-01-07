@@ -1,3 +1,16 @@
+<?php
+    $current_host = $vals['Host'];
+    $current_port = isset($vals['Port']) ? $vals['Port'] : '';
+
+    if (strpos($current_host, ':') !== false) {
+        $parts = explode(':', $current_host);
+        $current_host = $parts[0];
+        
+        if (empty($current_port) && isset($parts[1])) {
+            $current_port = $parts[1];
+        }
+    }
+?>
 <h3>Konfiguracja SvxLink</h3>
 <form method="post">
     <input type="hidden" name="active_tab" class="active-tab-input" value="SvxConfig">
@@ -5,9 +18,13 @@
     <div class="form-grid-layout">
         <div class="panel-box">
             <h4 class="panel-title">Reflector (SQLink)</h4>
-            <div class="form-group"><label>Znak Noda</label><input type="text" name="Callsign" value="<?php echo $vals['Callsign']; ?>"></div>
+            <div class="form-group">
+                <label>Znak Noda</label>
+                <input type="text" name="Callsign" value="<?php echo $vals['Callsign']; ?>" oninput="this.value = this.value.toUpperCase()" style="text-transform:uppercase;">
+            </div>
             <div class="form-group"><label>Hasło</label><input type="password" name="Password" value="<?php echo $vals['Password']; ?>"></div>
-            <div class="form-group"><label>Host</label><input type="text" name="Host" value="<?php echo $vals['Host']; ?>"></div>
+            <div class="form-group"><label>Host</label><input type="text" name="Host" value="<?php echo $current_host; ?>"></div>
+            <div class="form-group"><label>Port</label><input type="number" name="Port" value="<?php echo $current_port; ?>" placeholder="5300"></div>
             <div class="form-group"><label>Domyślna Grupa (TG)</label><input type="text" name="DefaultTG" value="<?php echo $vals['DefaultTG']; ?>"></div>
             
             <div class="form-group">

@@ -1,4 +1,38 @@
 <?php
+    $custom_dtmf_file = '/var/www/html/dtmf_custom.json';
+
+    if (isset($_POST['add_dtmf_name']) && isset($_POST['add_dtmf_code'])) {
+        $name = trim($_POST['add_dtmf_name']);
+        $tg = preg_replace('/[^0-9]/', '', $_POST['add_dtmf_code']);
+        
+        if (!empty($name) && !empty($tg)) {
+            $current_data = [];
+            if (file_exists($custom_dtmf_file)) {
+                $json_content = file_get_contents($custom_dtmf_file);
+                $current_data = json_decode($json_content, true) ?? [];
+            }
+            
+            $current_data[] = ['name' => $name, 'tg' => $tg];
+            
+            file_put_contents($custom_dtmf_file, json_encode($current_data));
+        }
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit;
+    }
+
+    if (isset($_POST['del_dtmf_index'])) {
+        $idx = (int)$_POST['del_dtmf_index'];
+        if (file_exists($custom_dtmf_file)) {
+            $current_data = json_decode(file_get_contents($custom_dtmf_file), true) ?? [];
+            if (isset($current_data[$idx])) {
+                array_splice($current_data, $idx, 1);
+                file_put_contents($custom_dtmf_file, json_encode($current_data));
+            }
+        }
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit;
+    }
+
     if (isset($_GET['ajax_stats'])) {
         header('Content-Type: application/json');
         $stats = [];
