@@ -6,7 +6,7 @@ $TDTMF = [
         'tab_mine' => 'Moje',
         'grp_nat' => 'Ogólnopolska',
         'grp_se' => 'Sierra Echo',
-        'grp_ex' => 'ExtremeLink',
+        'grp_ex' => 'A. Dyplomowe',
         'grp_br' => 'Bridge UK',
         'grp_el' => 'EchoLink',
         'grp_tst' => 'Testowa',
@@ -37,10 +37,10 @@ $TDTMF = [
     'en' => [
         'h_groups' => 'Reflector / Groups',
         'tab_sq' => 'SQLink',
-        'tab_mine' => 'My',
+        'tab_mine' => 'My Buttons',
         'grp_nat' => 'National',
         'grp_se' => 'Sierra Echo',
-        'grp_ex' => 'ExtremeLink',
+        'grp_ex' => 'A. Diploma',
         'grp_br' => 'Bridge UK',
         'grp_el' => 'EchoLink',
         'grp_tst' => 'Test',
@@ -91,7 +91,7 @@ if (file_exists($custom_dtmf_file)) {
             <div class="macro-grid">
                 <button onclick="sendInstant('*91260#')" class="macro-btn"><?php echo $TDTMF[$lang]['grp_nat']; ?><span class="dtmf-sub">TG 260</span></button>
                 <button onclick="sendInstant('*9126077#')" class="macro-btn"><?php echo $TDTMF[$lang]['grp_se']; ?><span class="dtmf-sub">TG 26077</span></button>
-                <button onclick="sendInstant('*91260066#')" class="macro-btn"><?php echo $TDTMF[$lang]['grp_ex']; ?><span class="dtmf-sub">TG 260066</span></button>
+                <button onclick="sendInstant('*91225#')" class="macro-btn"><?php echo $TDTMF[$lang]['grp_ex']; ?><span class="dtmf-sub">TG 260066</span></button>
                 <button onclick="sendInstant('*91235#')" class="macro-btn"><?php echo $TDTMF[$lang]['grp_br']; ?><span class="dtmf-sub">TG 235</span></button>
                 <button onclick="sendInstant('*91245#')" class="macro-btn"><?php echo $TDTMF[$lang]['grp_el']; ?><span class="dtmf-sub">TG 245</span></button>
                 <button onclick="sendInstant('*91999#')" class="macro-btn"><?php echo $TDTMF[$lang]['grp_tst']; ?><span class="dtmf-sub">TG 999</span></button>
