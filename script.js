@@ -1,4 +1,47 @@
 $.ajaxSetup({ cache: false });
+
+// Słownik tłumaczeń dla JavaScript
+const currentLang = document.documentElement.lang || 'pl';
+const TRANS = {
+    pl: {
+        el_off: "EchoLink Wył.",
+        el_err: "Błąd Proxy EchoLink",
+        el_on: "EchoLink Online",
+        el_conn: "EchoLink Łączenie...",
+        sys_start: "START SYSTEMU...",
+        ref_on: "ONLINE (Reflector)",
+        ref_conn: "PODŁĄCZONY",
+        ref_off: "OFFLINE (Reflector)",
+        ref_disc: "ROZŁĄCZONY",
+        el_connected: "POŁĄCZONO",
+        el_disconnected: "ROZŁĄCZONO",
+        tx: "NADAWANIE (TX)...",
+        rx_local: "ODBIERANIE (RX - LOCAL)...",
+        standby: "STAN: CZUWANIE (Standby)",
+        no_nodes: "Brak aktywnych węzłów",
+        no_tg: "Brak (Czuwanie)"
+    },
+    en: {
+        el_off: "EchoLink Off",
+        el_err: "EchoLink Proxy Error",
+        el_on: "EchoLink Online",
+        el_conn: "EchoLink Connecting...",
+        sys_start: "SYSTEM START...",
+        ref_on: "ONLINE (Reflector)",
+        ref_conn: "CONNECTED",
+        ref_off: "OFFLINE (Reflector)",
+        ref_disc: "DISCONNECTED",
+        el_connected: "CONNECTED",
+        el_disconnected: "DISCONNECTED",
+        tx: "TRANSMITTING (TX)...",
+        rx_local: "RECEIVING (RX - LOCAL)...",
+        standby: "STATUS: STANDBY",
+        no_nodes: "No active nodes",
+        no_tg: "None (Standby)"
+    }
+};
+const T = TRANS[currentLang];
+
 function selectWifi(ssid) { document.getElementById('wifi-ssid').value = ssid; }
 var dtmfBuffer = ""; 
 var display = document.getElementById("dtmf-screen");
@@ -157,19 +200,19 @@ function updateStats() {
         elDot.removeClass("blink");
         if (!stats.el_enabled) {
             elDot.css("background-color", "#777").css("box-shadow", "none");
-            elText.text("EchoLink Off").css("color", "#777").css("font-weight", "bold");
+            elText.text(T.el_off).css("color", "#777").css("font-weight", "bold");
         } 
         else if (stats.el_error) {
             elDot.css("background-color", "#F44336").css("box-shadow", "0 0 8px #F44336").addClass("blink");
-            elText.text("EchoLink Offline Proxy Error").css("color", "#F44336").css("font-weight", "bold");
+            elText.text(T.el_err).css("color", "#F44336").css("font-weight", "bold");
         } 
         else if (stats.el_online) {
             elDot.css("background-color", "#4CAF50").css("box-shadow", "0 0 8px #4CAF50").addClass("blink");
-            elText.text("EchoLink Online").css("color", "#4CAF50").css("font-weight", "bold");
+            elText.text(T.el_on).css("color", "#4CAF50").css("font-weight", "bold");
         }
         else {
             elDot.css("background-color", "#FF9800").css("box-shadow", "0 0 8px #FF9800").addClass("blink");
-            elText.text("EchoLink Connecting...").css("color", "#FF9800").css("font-weight", "bold");
+            elText.text(T.el_conn).css("color", "#FF9800").css("font-weight", "bold");
         }
     });
 }
@@ -201,7 +244,7 @@ function loadLogsAndStatus() {
         );
         let isOnline = false;
         if (data.length < 50) {
-             $("#main-status-text").text("SYSTEM START...").removeClass("inactive").addClass("active");
+             $("#main-status-text").text(T.sys_start).removeClass("inactive").addClass("active");
              $("#main-status-dot").removeClass("red").addClass("orange").addClass("blink");
         } else {
              if (lastConnect > lastDisconnect || (lastConnect === -1 && lastDisconnect === -1)) {
@@ -211,25 +254,25 @@ function loadLogsAndStatus() {
             }
         }
         if (isOnline) {
-            $("#main-status-text").text("ONLINE (Reflector)").removeClass("inactive").addClass("active");
+            $("#main-status-text").text(T.ref_on).removeClass("inactive").addClass("active");
             $("#main-status-dot").removeClass("red").removeClass("orange").addClass("green").addClass("blink");
-            $("#ref-status").html("PODŁĄCZONY").css("color", "#4CAF50");
+            $("#ref-status").html(T.ref_conn).css("color", "#4CAF50");
         } else if (data.length >= 50) {
-            $("#main-status-text").text("OFFLINE (Reflector)").removeClass("active").addClass("inactive");
+            $("#main-status-text").text(T.ref_off).removeClass("active").addClass("inactive");
             $("#main-status-dot").removeClass("green").removeClass("orange").addClass("red").removeClass("blink");
-            $("#ref-status").html("ROZŁĄCZONY").css("color", "#F44336");
+            $("#ref-status").html(T.ref_disc).css("color", "#F44336");
         }
         let lastOn = data.lastIndexOf("EchoLink directory status changed to ON");
         let lastOff = Math.max(data.lastIndexOf("EchoLink directory status changed to ?"), data.lastIndexOf("Disconnected from EchoLink proxy"));
         if (lastOn > lastOff) { 
-            $("#el-live-status").text("CONNECTED").removeClass("el-disconnected").addClass("el-connected"); 
+            $("#el-live-status").text(T.el_connected).removeClass("el-disconnected").addClass("el-connected"); 
         } else if (lastOff > -1) { 
-            $("#el-live-status").text("DISCONNECTED").removeClass("el-connected").addClass("el-disconnected"); 
+            $("#el-live-status").text(T.el_disconnected).removeClass("el-connected").addClass("el-disconnected"); 
         }
         let isTalking = false;
         let currentCallsign = "---";
         let currentTG = "";
-        let statusText = "STAN: CZUWANIE (Standby)";
+        let statusText = T.standby;
         let lastStartPos = -1; let lastStopPos = -1;
         let talkerRegex = /Talker start on TG #(\d+): ([A-Z0-9-\/]+)/g;
         while ((match = talkerRegex.exec(data)) !== null) { 
@@ -243,21 +286,21 @@ function loadLogsAndStatus() {
         }
         if (lastStartPos > lastStopPos && lastStartPos !== -1) {
             isTalking = true;
-            statusText = "NADAWANIE (TX)..."; 
+            statusText = T.tx; 
         }
         let lastTxOn = data.lastIndexOf("Tx1: Turning the transmitter ON");
         let lastTxOff = data.lastIndexOf("Tx1: Turning the transmitter OFF");
         if (lastTxOn > lastTxOff && lastTxOn !== -1) {
             if(!isTalking) {
                 isTalking = true;
-                statusText = "NADAWANIE (TX)..."; 
+                statusText = T.tx; 
             }
         }
         let lastSqOpen = data.lastIndexOf("Rx1: The squelch is OPEN");
         let lastSqClose = data.lastIndexOf("Rx1: The squelch is CLOSED");
         if (lastSqOpen > lastSqClose && lastSqOpen !== -1) {
             isTalking = true;
-            statusText = "ODBIERANIE (RX - LOCAL)...";
+            statusText = T.rx_local;
             currentCallsign = "LOKALNIE"; 
         }
         $(".live-box").removeClass("talking rx-active tx-active");
@@ -265,7 +308,9 @@ function loadLogsAndStatus() {
             $(".live-status").text(statusText);
             $(".live-callsign").text(currentCallsign);
             if(currentTG) $(".live-tg").text("TG " + currentTG).css("color", "#FF9800");
-            if (statusText.includes("RX") || statusText.includes("ODBIERANIE")) {
+            
+            // Proste sprawdzanie po kolorach/stanach
+            if (statusText.includes("RX") || statusText.includes("RECEIVING") || statusText.includes("ODBIERANIE")) {
                 $(".live-box").addClass("rx-active");
                 $(".live-status, .live-callsign").css("color", "#4CAF50");
             } else {
@@ -273,7 +318,7 @@ function loadLogsAndStatus() {
                 $(".live-status, .live-callsign").css("color", "#FF9800");
             }
         } else {
-            $(".live-status").text("STAN: CZUWANIE (Standby)").css("color", "#666");
+            $(".live-status").text(T.standby).css("color", "#666");
             $(".live-callsign").text("---").css("color", "#fff");
             $(".live-tg").text("");
         }
@@ -289,7 +334,7 @@ function updateNodes() {
         var nodeKeys = Object.keys(data.nodes).sort();
         var html = "";
         if (nodeKeys.length === 0) {
-            html = "<div style='grid-column:1/-1;text-align:center;color:#777;'>Brak aktywnych węzłów</div>";
+            html = "<div style='grid-column:1/-1;text-align:center;color:#777;'>" + T.no_nodes + "</div>";
         } else {
             nodeKeys.forEach(function(call) {
                 var isMe = (call === myCall);
@@ -318,7 +363,7 @@ function showTooltip(e, callsign) {
          name = info.qth[0].name;
     }
     $("#nt-name").text(name);
-    var activeTg = (info.tg && info.tg !== 0) ? info.tg : "Brak (Czuwanie)";
+    var activeTg = (info.tg && info.tg !== 0) ? info.tg : T.no_tg;
     $("#nt-tg").text(activeTg);
     var locator = "---";
     if (info.Locator) {

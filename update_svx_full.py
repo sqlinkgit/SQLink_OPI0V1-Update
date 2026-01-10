@@ -188,14 +188,16 @@ def main():
             "REFCON_ENABLE": data.get('RefStatusInfo'),
             "UDP_HEARTBEAT_INTERVAL": "15",
             "LOCATION": f'"{location_str}"',
-            "NODE_INFO_FILE": NODE_INFO_FILE
+            "NODE_INFO_FILE": NODE_INFO_FILE,
+            "DEFAULT_LANG": data.get('AudioLang')
         },
         "SimplexLogic": {
             "CALLSIGN": simplex_callsign,
             "RGR_SOUND_ALWAYS": data.get('RogerBeep'),
             "MODULES": data.get('Modules'),
             "SHORT_IDENT_INTERVAL": "60" if announce_call=="1" else "0",
-            "LONG_IDENT_INTERVAL": "60" if announce_call=="1" else "0"
+            "LONG_IDENT_INTERVAL": "60" if announce_call=="1" else "0",
+            "DEFAULT_LANG": data.get('AudioLang')
         },
         "EchoLink": {
             "CALLSIGN": data.get('EL_Callsign'),

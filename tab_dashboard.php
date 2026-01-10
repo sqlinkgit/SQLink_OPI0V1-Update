@@ -1,6 +1,37 @@
 <?php
+$TD = [
+    'pl' => [
+        'freq' => 'Częstotliwość',
+        'host' => 'Host',
+        'call' => 'Znak',
+        'hw' => 'Sprzęt:',
+        'ctcss' => 'CTCSS:',
+        'status_standby' => 'STAN: CZUWANIE (Standby)',
+        'lh_title' => 'Ostatnio Słyszani (Last Heard)',
+        'th_time' => 'Godzina',
+        'th_tg' => 'TG',
+        'th_call' => 'Znak',
+        'loading' => 'Ładowanie...',
+        'none_csq' => 'Brak (CSQ)'
+    ],
+    'en' => [
+        'freq' => 'Frequency',
+        'host' => 'Host',
+        'call' => 'Callsign',
+        'hw' => 'Hardware:',
+        'ctcss' => 'CTCSS:',
+        'status_standby' => 'STATUS: STANDBY',
+        'lh_title' => 'Last Heard',
+        'th_time' => 'Time',
+        'th_tg' => 'TG',
+        'th_call' => 'Callsign',
+        'loading' => 'Loading...',
+        'none_csq' => 'None (CSQ)'
+    ]
+];
+
 $CTCSS_MAP = [
-    "0000" => "Brak (CSQ)", "0670" => "67.0 Hz", "0693" => "69.3 Hz", "0719" => "71.9 Hz", "0744" => "74.4 Hz", 
+    "0000" => $TD[$lang]['none_csq'], "0670" => "67.0 Hz", "0693" => "69.3 Hz", "0719" => "71.9 Hz", "0744" => "74.4 Hz", 
     "0770" => "77.0 Hz", "0797" => "79.7 Hz", "0825" => "82.5 Hz", "0854" => "85.4 Hz", "0885" => "88.5 Hz", 
     "0915" => "91.5 Hz", "0948" => "94.8 Hz", "0974" => "97.4 Hz", "1000" => "100.0 Hz", "1035" => "103.5 Hz", 
     "1072" => "107.2 Hz", "1109" => "110.9 Hz", "1148" => "114.8 Hz", "1188" => "118.8 Hz", "1230" => "123.0 Hz", 
@@ -72,19 +103,19 @@ function formatCtcssCode($code, $map) {
 <div class="dash-grid">
     <div class="dash-tile">
         <div class="dash-icon">📡</div>
-        <div class="dash-label">Częstotliwość</div>
+        <div class="dash-label"><?php echo $TD[$lang]['freq']; ?></div>
         <div class="dash-value"><?php echo $radio['rx']; ?> MHz</div>
     </div>
     
     <div class="dash-tile">
         <div class="dash-icon">🌍</div>
-        <div class="dash-label">Host</div>
+        <div class="dash-label"><?php echo $TD[$lang]['host']; ?></div>
         <div class="dash-value"><?php echo $vals['Host']; ?></div>
     </div>
 
     <div class="dash-tile">
         <div class="dash-icon">🆔</div>
-        <div class="dash-label">Znak</div>
+        <div class="dash-label"><?php echo $TD[$lang]['call']; ?></div>
         <div class="dash-value"><?php echo $vals['Callsign']; ?></div>
     </div>
 </div>
@@ -92,14 +123,14 @@ function formatCtcssCode($code, $map) {
 <div style="text-align:center; margin-bottom:25px; display:flex; justify-content:center; gap: 15px; flex-wrap: wrap;">
     <div style="background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; display:flex; align-items:center; gap:8px;">
         <span style="font-size:16px;">📻</span>
-        <span style="font-size:13px; color:#aaa;">Sprzęt:</span>
+        <span style="font-size:13px; color:#aaa;"><?php echo $TD[$lang]['hw']; ?></span>
         <b style="color:#fff; font-size:14px;"><?php echo isset($radio['desc']) ? $radio['desc'] : 'SA818 Module'; ?></b>
     </div>
 
     <?php if(isset($radio['ctcss']) && $radio['ctcss'] != '0000'): ?>
     <div style="background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; display:flex; align-items:center; gap:8px;">
         <span style="font-size:16px;">🔒</span>
-        <span style="font-size:13px; color:#aaa;">CTCSS:</span>
+        <span style="font-size:13px; color:#aaa;"><?php echo $TD[$lang]['ctcss']; ?></span>
         <b style="color:#FF9800; font-size:14px;">
             <?php echo formatCtcssCode($radio['ctcss'], $CTCSS_MAP); ?>
         </b>
@@ -108,21 +139,21 @@ function formatCtcssCode($code, $map) {
 </div>
 
 <div id="live-monitor" class="live-box">
-    <div class="live-status">STAN: CZUWANIE (Standby)</div>
+    <div class="live-status"><?php echo $TD[$lang]['status_standby']; ?></div>
     <div class="live-callsign">---</div>
     <div class="live-tg"></div>
 </div>
 
-<h3 style="color: #4CAF50; margin-top:20px;">Ostatnio Słyszani (Last Heard)</h3>
+<h3 style="color: #4CAF50; margin-top:20px;"><?php echo $TD[$lang]['lh_title']; ?></h3>
 <table class="lh-table">
     <thead>
         <tr>
-            <th>Godzina</th>
-            <th>TG</th>
-            <th>Znak</th>
+            <th><?php echo $TD[$lang]['th_time']; ?></th>
+            <th><?php echo $TD[$lang]['th_tg']; ?></th>
+            <th><?php echo $TD[$lang]['th_call']; ?></th>
         </tr>
     </thead>
     <tbody id="lh-content">
-        <tr><td colspan="3">Ładowanie...</td></tr>
+        <tr><td colspan="3"><?php echo $TD[$lang]['loading']; ?></td></tr>
     </tbody>
 </table>

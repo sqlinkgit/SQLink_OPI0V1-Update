@@ -65,10 +65,21 @@ if [ -d "$GIT_DIR/PL" ]; then
     fi
 fi
 
+if [ -d "$GIT_DIR/en_US" ]; then
+    mkdir -p "$SOUNDS_DIR/en_US"
+    rsync -av --delete "$GIT_DIR/en_US/" "$SOUNDS_DIR/en_US/"
+    chmod -R 777 "$SOUNDS_DIR/en_US"
+fi
+
 cp $GIT_DIR/*.css $WWW_DIR/ 2>/dev/null
 cp $GIT_DIR/*.js $WWW_DIR/ 2>/dev/null
 cp $GIT_DIR/*.png $WWW_DIR/ 2>/dev/null
 cp $GIT_DIR/*.php $WWW_DIR/
+
+mkdir -p "$WWW_DIR/flags"
+cp $GIT_DIR/*.svg "$WWW_DIR/flags/" 2>/dev/null
+chown -R www-data:www-data "$WWW_DIR/flags"
+chmod 644 "$WWW_DIR/flags/"*.svg 2>/dev/null
 
 if [ ! -f "$WWW_DIR/radio_config.json" ] && [ -f "$GIT_DIR/radio_config.json" ]; then
     cp $GIT_DIR/radio_config.json $WWW_DIR/
