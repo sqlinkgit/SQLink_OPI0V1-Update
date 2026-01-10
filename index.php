@@ -1,57 +1,86 @@
 <?php
     session_start();
+
     if (isset($_GET['lang'])) {
         $_SESSION['lang'] = $_GET['lang'];
-        header("Location: index.php");
-        exit;
     }
     $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'pl';
 
-    $L = [
+    $TR = [
         'pl' => [
-            'no_ip' => 'Brak IP',
-            'saved_audio' => 'Zapisano ustawienia audio!',
+            'audio_saved' => '✅ Audio ZAPISANE.',
             'saved_restart' => 'Zapisano! Restart...',
-            'radio_hw' => 'Radio i Hardware:',
+            'radio_gpio_saved' => 'Konfiguracja Radio i GPIO Zapisana! Restart...',
             'restart_svc' => 'Restart Usługi...',
-            'reboot' => '🔄 Reboot...',
-            'shutdown' => '🛑 Shutdown...',
-            'del_net' => 'Usunięto sieć:',
+            'rebooting' => '🔄 Reboot...',
+            'shutting_down' => '🛑 Shutdown...',
+            'proxy_started' => '♻️ Uruchomiono Proxy Hunter (Szukam najlepszego serwera... Czekaj).',
+            'proxy_missing' => 'Brak pliku proxy_hunter.py w /usr/local/bin!',
+            'update_success' => '✅ AKTUALIZACJA ZAKOŃCZONA SUKCESEM!',
+            'restarting_soon' => 'System zostanie zrestartowany za',
+            'restarting_now' => 'Trwa ponowne uruchamianie...',
+            'wait_refresh' => 'Poczekaj chwilę i odśwież stronę.',
+            'up_to_date' => '⚠️ SYSTEM JEST JUŻ AKTUALNY',
+            'no_changes' => 'Brak nowych zmian do pobrania. Powrót za chwilę...',
+            'update_error' => '❌ BŁĄD AKTUALIZACJI!',
+            'btn_back' => 'Wróć',
+            'wifi_deleted' => 'Usunięto sieć.',
+            'ip_missing' => 'Brak IP',
+            'cpu_temp' => 'CPU Temp',
+            'ram_used' => 'RAM Used',
+            'disk_used' => 'Disk Used',
+            'network' => 'Network',
+            'hardware' => 'Hardware',
             'logics' => 'Logiki',
             'modules' => 'Moduły',
-            'tab_dash' => 'Dashboard',
+            'tg_default' => 'TG Default',
+            'tg_active' => 'TG Active',
+            'reflector' => 'Reflector',
+            'uptime' => 'Uptime',
+            'tab_dashboard' => 'Dashboard',
             'tab_nodes' => 'Nodes',
             'tab_dtmf' => 'DTMF',
             'tab_radio' => 'Radio',
             'tab_audio' => 'Audio',
-            'tab_config' => 'Config',
+            'tab_config' => 'Konfiguracja',
             'tab_wifi' => 'WiFi',
             'tab_power' => 'Zasilanie',
             'tab_logs' => 'Logi',
             'tab_help' => 'Pomoc',
-            'update_ok' => '✅ AKTUALIZACJA ZAKOŃCZONA SUKCESEM!',
-            'update_rest' => 'System zostanie zrestartowany za <span id=\'cnt\'>5</span> sekund...',
-            'rebooting' => 'Trwa ponowne uruchamianie...',
-            'wait_refresh' => 'Poczekaj chwilę i odśwież stronę.',
-            'update_uptodate' => '⚠️ SYSTEM JEST JUŻ AKTUALNY',
-            'no_changes' => 'Brak nowych zmian do pobrania. Powrót za chwilę...',
-            'update_err' => '❌ BŁĄD AKTUALIZACJI!',
-            'btn_back' => 'Wróć',
-            'sys_start' => 'SYSTEM START...',
-            'el_init' => 'EchoLink Init...'
+            'footer_system' => 'System SQLink',
+            'source_code' => 'Kod źródłowy'
         ],
         'en' => [
-            'no_ip' => 'No IP',
-            'saved_audio' => 'Audio settings saved!',
+            'audio_saved' => '✅ Audio SAVED.',
             'saved_restart' => 'Saved! Restarting...',
-            'radio_hw' => 'Radio and Hardware:',
+            'radio_gpio_saved' => 'Radio & GPIO Config Saved! Restarting...',
             'restart_svc' => 'Restarting Service...',
-            'reboot' => '🔄 Rebooting...',
-            'shutdown' => '🛑 Shutting down...',
-            'del_net' => 'Network deleted:',
+            'rebooting' => '🔄 Rebooting...',
+            'shutting_down' => '🛑 Shutting down...',
+            'proxy_started' => '♻️ Proxy Hunter started (Searching for best server... Wait).',
+            'proxy_missing' => 'Missing proxy_hunter.py in /usr/local/bin!',
+            'update_success' => '✅ UPDATE SUCCESSFUL!',
+            'restarting_soon' => 'System will reboot in',
+            'restarting_now' => 'Rebooting system...',
+            'wait_refresh' => 'Please wait a moment and refresh the page.',
+            'up_to_date' => '⚠️ SYSTEM IS UP TO DATE',
+            'no_changes' => 'No new changes to download. Returning...',
+            'update_error' => '❌ UPDATE ERROR!',
+            'btn_back' => 'Back',
+            'wifi_deleted' => 'Network deleted.',
+            'ip_missing' => 'No IP',
+            'cpu_temp' => 'CPU Temp',
+            'ram_used' => 'RAM Used',
+            'disk_used' => 'Disk Used',
+            'network' => 'Network',
+            'hardware' => 'Hardware',
             'logics' => 'Logics',
             'modules' => 'Modules',
-            'tab_dash' => 'Dashboard',
+            'tg_default' => 'TG Default',
+            'tg_active' => 'TG Active',
+            'reflector' => 'Reflector',
+            'uptime' => 'Uptime',
+            'tab_dashboard' => 'Dashboard',
             'tab_nodes' => 'Nodes',
             'tab_dtmf' => 'DTMF',
             'tab_radio' => 'Radio',
@@ -61,16 +90,8 @@
             'tab_power' => 'Power',
             'tab_logs' => 'Logs',
             'tab_help' => 'Help',
-            'update_ok' => '✅ UPDATE SUCCESSFUL!',
-            'update_rest' => 'System will reboot in <span id=\'cnt\'>5</span> seconds...',
-            'rebooting' => 'Rebooting system...',
-            'wait_refresh' => 'Please wait and refresh the page.',
-            'update_uptodate' => '⚠️ SYSTEM IS UP TO DATE',
-            'no_changes' => 'No new changes found. Returning...',
-            'update_err' => '❌ UPDATE ERROR!',
-            'btn_back' => 'Back',
-            'sys_start' => 'SYSTEM START...',
-            'el_init' => 'EchoLink Init...'
+            'footer_system' => 'SQLink System',
+            'source_code' => 'Source Code'
         ]
     ];
 
@@ -123,7 +144,7 @@
         $df = disk_free_space('/');
         $stats['disk_percent'] = round((($dt - $df) / $dt) * 100, 1);
         $ip = trim(shell_exec("hostname -I | awk '{print $1}'"));
-        $stats['ip'] = empty($ip) ? $L[$lang]['no_ip'] : $ip;
+        $stats['ip'] = empty($ip) ? $TR[$lang]['ip_missing'] : $ip;
         $ssid = trim(shell_exec("iwgetid -r"));
         if (!empty($ssid)) {
             $stats['net_type'] = "WiFi";
@@ -174,7 +195,7 @@
         foreach(['adc_vol'=>9, 'boost1_vol'=>8, 'boost2_vol'=>6, 'out_vol'=>3, 'dac_vol'=>1, 'mic1_pb_vol'=>7, 'mic2_pb_vol'=>5, 'linein_pb_vol'=>2] as $k => $id) if(isset($_POST[$k])) shell_exec("sudo amixer -c 0 cset numid=$id ".(int)$_POST[$k]);
         foreach(['Mic1_Cap_Sw'=>18, 'Mic2_Cap_Sw'=>19, 'LineIn_Cap_Sw'=>17, 'Mixer_Cap_Sw'=>15, 'LineOut_Sw'=>4, 'DAC_Sw'=>10, 'Mic1_PB_Sw'=>13, 'Mic2_PB_Sw'=>14, 'LineIn_PB_Sw'=>12] as $n => $id) shell_exec("sudo amixer -c 0 cset numid=$id ".(isset($_POST[$n])?'on':'off'));
         shell_exec("sudo alsactl store");
-        $audio_msg = "<div class='alert alert-success'>".$L[$lang]['saved_audio']."</div>";
+        $audio_msg = "<div class='alert alert-success'>".$TR[$lang]['audio_saved']."</div>";
     }
     $audio = []; foreach ($MIXER_IDS as $name => $id) $audio[$name] = get_amixer_val($id, 0);
     function parse_svx_conf($file) {
@@ -237,7 +258,7 @@
         if(isset($_POST['EL_Sysop'])) $vals_el['Sysop'] = $_POST['EL_Sysop'];
         if(isset($_POST['EL_Desc'])) $vals_el['Desc'] = $_POST['EL_Desc'];
         if(isset($_POST['EL_ProxyHost'])) $vals_el['Proxy'] = $_POST['EL_ProxyHost'];
-        echo "<div class='alert alert-success'>".$L[$lang]['saved_restart']."</div><meta http-equiv='refresh' content='3'>";
+        echo "<div class='alert alert-success'>".$TR[$lang]['saved_restart']."</div><meta http-equiv='refresh' content='3'>";
     }
 
     if (isset($_POST['save_radio'])) {
@@ -277,11 +298,11 @@
             if ($loaded) $radio = array_merge($radio, $loaded); 
         }
         
-        echo "<div class='alert alert-success'>".$L[$lang]['radio_hw']." $out</div>";
+        echo "<div class='alert alert-success'>".$TR[$lang]['radio_gpio_saved']." $out</div>";
     }
-    if (isset($_POST['restart_srv'])) { shell_exec('sudo /usr/bin/systemctl restart svxlink > /dev/null 2>&1 &'); echo "<div class='alert alert-success'>".$L[$lang]['restart_svc']."</div>"; }
-    if (isset($_POST['reboot_device'])) { shell_exec('sudo /usr/sbin/reboot > /dev/null 2>&1 &'); echo "<div class='alert alert-warning'>".$L[$lang]['reboot']."</div>"; }
-    if (isset($_POST['shutdown_device'])) { shell_exec('sudo /usr/sbin/shutdown -h now > /dev/null 2>&1 &'); echo "<div class='alert alert-error'>".$L[$lang]['shutdown']."</div>"; }
+    if (isset($_POST['restart_srv'])) { shell_exec('sudo /usr/bin/systemctl restart svxlink > /dev/null 2>&1 &'); echo "<div class='alert alert-success'>".$TR[$lang]['restart_svc']."</div>"; }
+    if (isset($_POST['reboot_device'])) { shell_exec('sudo /usr/sbin/reboot > /dev/null 2>&1 &'); echo "<div class='alert alert-warning'>".$TR[$lang]['rebooting']."</div>"; }
+    if (isset($_POST['shutdown_device'])) { shell_exec('sudo /usr/sbin/shutdown -h now > /dev/null 2>&1 &'); echo "<div class='alert alert-error'>".$TR[$lang]['shutting_down']."</div>"; }
     if (isset($_POST['auto_proxy'])) { $out = shell_exec("sudo /usr/local/bin/proxy_hunter.py 2>&1"); echo "<div class='alert alert-warning'><strong>♻️ Auto-Proxy:</strong><br><small>$out</small></div><meta http-equiv='refresh' content='3'>"; }
     
     if (isset($_POST['git_update'])) {
@@ -293,8 +314,8 @@
             shell_exec('(sleep 5; sudo /usr/sbin/reboot) > /dev/null 2>&1 &');
             echo "
             <div class='alert alert-success' style='text-align:left; margin: 20px;'>
-                <strong>".$L[$lang]['update_ok']."</strong><br>
-                ".$L[$lang]['update_rest']."
+                <strong>".$TR[$lang]['update_success']."</strong><br>
+                ".$TR[$lang]['restarting_soon']." <span id='cnt'>5</span> s...
                 <pre style='font-size:10px; margin-top:5px; background:#111; color:#ccc; padding:5px; border-radius:3px; max-height:300px; overflow:auto;'>$out</pre>
             </div>
             <script>
@@ -307,7 +328,7 @@
                     var el = document.getElementById('cnt');
                     if(el) el.innerText = sec;
                     if(sec <= 0) {
-                         document.body.innerHTML = '<h2 style=\"color:white; text-align:center; margin-top:50px; font-family:sans-serif;\">".$L[$lang]['rebooting']."<br><span style=\"font-size:16px; font-weight:normal;\">".$L[$lang]['wait_refresh']."</span></h2>';
+                         document.body.innerHTML = '<h2 style=\"color:white; text-align:center; margin-top:50px; font-family:sans-serif;\">".$TR[$lang]['restarting_now']."<br><span style=\"font-size:16px; font-weight:normal;\">".$TR[$lang]['wait_refresh']."</span></h2>';
                          setTimeout(function(){ window.location.href = '/'; }, 15000);
                     }
                 }, 1000);
@@ -316,8 +337,8 @@
         } elseif (strpos($out, 'STATUS: UP_TO_DATE') !== false) {
              echo "
              <div class='alert alert-warning' style='text-align:left; margin: 20px;'>
-                <strong>".$L[$lang]['update_uptodate']."</strong><br>
-                ".$L[$lang]['no_changes']."
+                <strong>".$TR[$lang]['up_to_date']."</strong><br>
+                ".$TR[$lang]['no_changes']."
              </div>
              <script>
                 if(document.getElementById('loading-overlay')) {
@@ -328,9 +349,9 @@
         } else {
             echo "
             <div class='alert alert-error' style='text-align:left; margin: 20px;'>
-                <strong>".$L[$lang]['update_err']."</strong><br>
+                <strong>".$TR[$lang]['update_error']."</strong><br>
                 <pre style='font-size:10px; margin-top:5px; background:#300; padding:5px; border-radius:3px; max-height:300px; overflow:auto;'>$out</pre>
-                <br><a href='/' class='btn btn-blue' style='display:inline-block; width:auto; padding:5px 10px;'>".$L[$lang]['btn_back']."</a>
+                <br><a href='/' class='btn btn-blue' style='display:inline-block; width:auto; padding:5px 10px;'>".$TR[$lang]['btn_back']."</a>
             </div>
             <script>
                 if(document.getElementById('loading-overlay')) {
@@ -341,12 +362,50 @@
     }
     
     $wifi_output = "";
-    if (isset($_POST['wifi_scan'])) { shell_exec('sudo nmcli dev wifi rescan'); $raw = shell_exec('sudo nmcli -t -f SSID,SIGNAL,SECURITY dev wifi list 2>&1'); $lines = explode("\n", $raw); foreach($lines as $line) { if(empty($line)) continue; $parts = explode(':', $line); $sec = array_pop($parts); $sig = array_pop($parts); $ssid = implode(':', $parts); if(!empty($ssid)) $wifi_scan_results[$ssid] = ['ssid'=>$ssid, 'signal'=>$sig, 'sec'=>$sec]; } usort($wifi_scan_results, function($a, $b) { return $b['signal'] - $a['signal']; }); }
+    $wifi_scan_results = [];
+    
+    if (isset($_POST['wifi_scan'])) { 
+        shell_exec('sudo nmcli dev wifi rescan'); 
+        $raw = shell_exec('sudo LC_ALL=C.UTF-8 nmcli -t -f SSID,SIGNAL,SECURITY dev wifi list 2>&1'); 
+        
+        $lines = explode("\n", $raw); 
+        foreach($lines as $line) { 
+            if(empty($line)) continue; 
+            $parts = explode(':', $line); 
+            $sec = array_pop($parts); 
+            $sig = array_pop($parts); 
+            $ssid = implode(':', $parts); 
+            if(!empty($ssid)) {
+                $wifi_scan_results[$ssid] = ['ssid'=>$ssid, 'signal'=>$sig, 'sec'=>$sec]; 
+            }
+        } 
+        usort($wifi_scan_results, function($a, $b) { return $b['signal'] - $a['signal']; }); 
+    }
+    
     $saved_wifi_list = [];
-    $saved_raw = shell_exec("sudo nmcli -t -f NAME,TYPE connection show | grep '802-11-wireless'");
-    if($saved_raw) { $s_lines = explode("\n", trim($saved_raw)); foreach($s_lines as $s_line) { $s_parts = explode(":", $s_line); if(count($s_parts) >= 1) { $saved_wifi_list[] = $s_parts[0]; } } }
-    if (isset($_POST['wifi_connect'])) { $ssid = escapeshellarg($_POST['ssid']); $pass = escapeshellarg($_POST['pass']); $wifi_output = shell_exec("sudo nmcli dev wifi connect $ssid password $pass 2>&1"); }
-    if (isset($_POST['wifi_delete'])) { $ssid = escapeshellarg($_POST['ssid']); $wifi_output = shell_exec("sudo nmcli connection delete $ssid 2>&1"); echo "<div class='alert alert-warning'>".$L[$lang]['del_net']." ".htmlspecialchars($_POST['ssid'])."</div><meta http-equiv='refresh' content='2'>"; }
+    $saved_raw = shell_exec("sudo LC_ALL=C.UTF-8 nmcli -t -f NAME,TYPE connection show | grep '802-11-wireless'");
+    if($saved_raw) { 
+        $s_lines = explode("\n", trim($saved_raw)); 
+        foreach($s_lines as $s_line) { 
+            $s_parts = explode(":", $s_line); 
+            if(count($s_parts) >= 1) { 
+                $saved_wifi_list[] = $s_parts[0]; 
+            } 
+        } 
+    }
+    
+    if (isset($_POST['wifi_connect'])) { 
+        $ssid = escapeshellarg($_POST['ssid']); 
+        $pass = escapeshellarg($_POST['pass']); 
+        $wifi_output = shell_exec("sudo LC_ALL=C.UTF-8 nmcli dev wifi connect $ssid password $pass 2>&1"); 
+    }
+    
+    if (isset($_POST['wifi_delete'])) { 
+        $ssid = escapeshellarg($_POST['ssid']); 
+        $wifi_output = shell_exec("sudo LC_ALL=C.UTF-8 nmcli connection delete $ssid 2>&1"); 
+        echo "<div class='alert alert-warning'>".$TR[$lang]['wifi_deleted']." ".htmlspecialchars($_POST['ssid'])."</div><meta http-equiv='refresh' content='2'>"; 
+    }
+    
     $cache_file = '/tmp/sqlink_alert_cache.txt';
     $cache_time = 3600; $alert_msg = "";
     if (file_exists($cache_file) && (time() - filemtime($cache_file) < $cache_time)) { $alert_msg = file_get_contents($cache_file); }
@@ -362,6 +421,25 @@
     <title>Hotspot <?php echo $vals['Callsign']; ?></title>
     <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .btn-loading {
+            position: relative;
+            color: transparent !important;
+            pointer-events: none;
+        }
+        .btn-loading::after {
+            content: "";
+            position: absolute;
+            left: 50%; top: 50%;
+            width: 16px; height: 16px;
+            margin-left: -8px; margin-top: -8px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -385,11 +463,11 @@
         <div class="status-bar" style="flex-direction: column; gap: 5px; margin-top:5px;">
             <div style="display:flex; align-items:center; gap:10px;">
                 <span id="main-status-dot" class="status-dot red"></span>
-                <span id="main-status-text" class="status-text inactive"><?php echo $L[$lang]['sys_start']; ?></span>
+                <span id="main-status-text" class="status-text inactive"><?php echo $TR[$lang]['sys_start']; ?></span>
             </div>
             <div style="display:flex; align-items:center; gap:10px;">
                 <span id="el-status-dot" class="status-dot" style="background-color: #444;"></span>
-                <span id="el-status-text" class="status-text" style="color: #666; font-size: 0.85em; font-weight:normal;"><?php echo $L[$lang]['el_init']; ?></span>
+                <span id="el-status-text" class="status-text" style="color: #666; font-size: 0.85em; font-weight:normal;"><?php echo $TR[$lang]['el_init']; ?></span>
             </div>
         </div>
     </header>
@@ -401,24 +479,24 @@
         <div class="t-box"><div class="t-label">Hardware</div><div class="t-val" id="t-hw" style="font-size:10px; margin-top:5px;">...</div></div>
     </div>
     <div class="info-panel">
-        <div class="info-box"><div class="info-label"><?php echo $L[$lang]['logics']; ?></div><div class="info-value" style="font-size:11px;"><?php echo str_replace(',', ', ', $glob['LOGICS'] ?? '-'); ?></div></div>
-        <div class="info-box"><div class="info-label"><?php echo $L[$lang]['modules']; ?></div><div class="info-value" style="font-size:11px;"><?php echo $vals['Modules']; ?></div></div>
+        <div class="info-box"><div class="info-label"><?php echo $TR[$lang]['logics']; ?></div><div class="info-value" style="font-size:11px;"><?php echo str_replace(',', ', ', $glob['LOGICS'] ?? '-'); ?></div></div>
+        <div class="info-box"><div class="info-label"><?php echo $TR[$lang]['modules']; ?></div><div class="info-value" style="font-size:11px;"><?php echo $vals['Modules']; ?></div></div>
         <div class="info-box"><div class="info-label">TG Default</div><div class="info-value hl"><?php echo $vals['DefaultTG']; ?></div></div>
         <div class="info-box"><div class="info-label">TG Active</div><div class="info-value hl" id="tg-active">---</div></div>
         <div class="info-box"><div class="info-label">Reflector</div><div class="info-value" id="ref-status">---</div></div>
         <div class="info-box"><div class="info-label">Uptime</div><div class="info-value" style="font-size:11px;"><?php echo shell_exec("uptime -p"); ?></div></div>
     </div>
     <div class="tabs">
-        <button id="btn-Dashboard" class="tab-btn active" onclick="openTab(event, 'Dashboard')"><?php echo $L[$lang]['tab_dash']; ?></button>
-        <button id="btn-Nodes" class="tab-btn" onclick="openTab(event, 'Nodes')"><?php echo $L[$lang]['tab_nodes']; ?></button>
-        <button id="btn-DTMF" class="tab-btn" onclick="openTab(event, 'DTMF')"><?php echo $L[$lang]['tab_dtmf']; ?></button>
-        <button id="btn-Radio" class="tab-btn" onclick="openTab(event, 'Radio')"><?php echo $L[$lang]['tab_radio']; ?></button>
-        <button id="btn-Audio" class="tab-btn" onclick="openTab(event, 'Audio')"><?php echo $L[$lang]['tab_audio']; ?></button>
-        <button id="btn-SvxConfig" class="tab-btn" onclick="openTab(event, 'SvxConfig')"><?php echo $L[$lang]['tab_config']; ?></button>
-        <button id="btn-WiFi" class="tab-btn" onclick="openTab(event, 'WiFi')"><?php echo $L[$lang]['tab_wifi']; ?></button>
-        <button id="btn-Power" class="tab-btn" onclick="openTab(event, 'Power')"><?php echo $L[$lang]['tab_power']; ?></button>
-        <button id="btn-Logs" class="tab-btn" onclick="openTab(event, 'Logs')"><?php echo $L[$lang]['tab_logs']; ?></button>
-        <button id="btn-Help" class="tab-btn" onclick="openTab(event, 'Help')"><?php echo $L[$lang]['tab_help']; ?></button>
+        <button id="btn-Dashboard" class="tab-btn active" onclick="openTab(event, 'Dashboard')"><?php echo $TR[$lang]['tab_dashboard']; ?></button>
+        <button id="btn-Nodes" class="tab-btn" onclick="openTab(event, 'Nodes')"><?php echo $TR[$lang]['tab_nodes']; ?></button>
+        <button id="btn-DTMF" class="tab-btn" onclick="openTab(event, 'DTMF')"><?php echo $TR[$lang]['tab_dtmf']; ?></button>
+        <button id="btn-Radio" class="tab-btn" onclick="openTab(event, 'Radio')"><?php echo $TR[$lang]['tab_radio']; ?></button>
+        <button id="btn-Audio" class="tab-btn" onclick="openTab(event, 'Audio')"><?php echo $TR[$lang]['tab_audio']; ?></button>
+        <button id="btn-SvxConfig" class="tab-btn" onclick="openTab(event, 'SvxConfig')"><?php echo $TR[$lang]['tab_config']; ?></button>
+        <button id="btn-WiFi" class="tab-btn" onclick="openTab(event, 'WiFi')"><?php echo $TR[$lang]['tab_wifi']; ?></button>
+        <button id="btn-Power" class="tab-btn" onclick="openTab(event, 'Power')"><?php echo $TR[$lang]['tab_power']; ?></button>
+        <button id="btn-Logs" class="tab-btn" onclick="openTab(event, 'Logs')"><?php echo $TR[$lang]['tab_logs']; ?></button>
+        <button id="btn-Help" class="tab-btn" onclick="openTab(event, 'Help')"><?php echo $TR[$lang]['tab_help']; ?></button>
     </div>
     <div id="Dashboard" class="tab-content active"><?php include 'tab_dashboard.php'; ?></div>
     <div id="DTMF" class="tab-content"><?php include 'tab_dtmf.php'; ?></div>
@@ -433,9 +511,9 @@
 </div>
 <div class="main-footer">
     SvxLink v1.9.99.36@master Copyright (C) 2003-<?php echo date("Y"); ?> Tobias Blomberg / <span class="callsign-blue">SM0SVX</span><br>
-    <span class="callsign-blue">SQLink System</span> • SierraEcho Team Edition<br>
+    <span class="callsign-blue"><?php echo $TR[$lang]['footer_system']; ?></span> • SierraEcho & Team Edition<br>
     Copyright &copy; 2025<?php if(date("Y") > 2025) echo "-".date("Y"); ?> by <span class="callsign-blue">SQ7UTP</span>
-    <div style="margin-top: 5px; font-size: 9px; opacity: 0.6;"><a href="https://github.com/SQLink-Official/SQLink-Official" target="_blank" style="color: inherit; text-decoration: none;">Source Code (AGPL v3)</a></div>
+    <div style="margin-top: 5px; font-size: 9px; opacity: 0.6;"><a href="https://github.com/SQLink-Official/SQLink-Official" target="_blank" style="color: inherit; text-decoration: none;"><?php echo $TR[$lang]['source_code']; ?> (AGPL v3)</a></div>
 </div>
 <script> const GLOBAL_CALLSIGN = "<?php echo $vals['Callsign']; ?>"; </script>
 <script src="script.js?v=<?php echo time(); ?>"></script>
